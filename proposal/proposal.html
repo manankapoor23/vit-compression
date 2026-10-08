@@ -28,9 +28,9 @@ figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; lin
 
 <table class="meta">
 <tr><td>Problem</td><td>P49: Compressing a Vision Transformer to 10 MB [Challenging]</td></tr>
-<tr><td>Model</td><td>DeiT-Small, a standard image classifier: 22 million numbers, 88.2 MB on disk, 79.7% accuracy</td></tr>
-<tr><td>Target</td><td>Under 10 MB, which leaves about 3.6 bits for each number instead of 32</td></tr>
-<tr><td>Data</td><td>ImageNet (50,000 test photos, 1,000 categories), plus 14 kinds of artificial damage such as noise, blur and fog on 5,000 of them</td></tr>
+<tr><td>Model</td><td>DeiT-Small, a standard Vision Transformer classifier: 22 million weights (the numbers it learned), 88.2 MB on disk, 79.7% top-1 accuracy</td></tr>
+<tr><td>Target</td><td>Under 10 MB, which leaves about 3.6 bits per weight instead of 32</td></tr>
+<tr><td>Data</td><td>ImageNet validation set (50,000 images, 1,000 classes), plus 14 ImageNet-C corruptions (artificial noise, blur, weather and digital damage) at severity 3 of 5, on 5,000 of them</td></tr>
 <tr><td>Deliverable</td><td>UCS532 sessional report, CVPR format</td></tr>
 <tr><td>Duration</td><td>7 weeks (Week 3 to Week 9), checkpoint at Week 6</td></tr>
 </table>
@@ -38,42 +38,42 @@ figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; lin
 <h2>1 Motivation and Central Idea</h2>
 <p>Phones and small devices cannot hold an 88 MB model. P49 asks for one under 10 MB, using three standard ideas:</p>
 <ul>
-<li><b>Quantisation:</b> store each number with fewer bits, by rounding it to one of a few allowed values.</li>
+<li><b>Quantisation:</b> store each weight with fewer bits, by rounding it to one of a few allowed values.</li>
 <li><b>Pruning:</b> delete the parts of the network that matter least.</li>
 <li><b>Distillation:</b> train a smaller network to copy the answers of the big one.</li>
 </ul>
 <figure><img src="figs/fig_techniques.svg"><figcaption><b>Figure 1.</b> The three ideas. The numbers on the left are real: three weights rounded to 3-bit codes, plus one shared scale that turns them back into numbers.</figcaption></figure>
-<p>Papers usually compare these methods on one number: accuracy on clean photos. While building the four models, I noticed two problems with that.</p>
-<p><b>The size on paper is not the size on disk.</b> Papers estimate size with a formula, number of weights × bits ÷ 8. A real file also stores small extra numbers (scales) and keeps a few layers at higher precision. For large models this adds only 2–5%, so the formula is fine there. For small models squeezed hard, it is not: my real 2-bit DeiT-Small file is 29% bigger than the formula says, and DeiT-Tiny 53% bigger.</p>
-<p><b>One accuracy number hides a lot.</b> Two models can score the same and still get different photos wrong, or behave differently when the photo is noisy or blurred.</p>
-<div class="box"><p><b>Central question.</b> If four compressed models have exactly the same file size and the same amount of training, do they fail on the same photos? And does the model that wins on clean photos still win on damaged ones?</p></div>
+<p>Papers usually compare these methods on one number: accuracy on clean images. While building the four models, I noticed two problems with that.</p>
+<p><b>The size on paper is not the size on disk.</b> Papers estimate size with a formula, number of weights × bits ÷ 8. A real file also stores small extra numbers (scales, which turn the rounded codes back into weights) and keeps a few layers at higher precision. For large models this adds only 2–5%, so the formula is fine there. For small models squeezed hard, it is not: my real 2-bit DeiT-Small file is 29% bigger than the formula says, and DeiT-Tiny 53% bigger.</p>
+<p><b>One accuracy number hides a lot.</b> Two models can score the same and still get different images wrong, or behave differently when the image is noisy or blurred.</p>
+<div class="box"><p><b>Central question.</b> If four compressed models have exactly the same file size and the same amount of training, do they fail on the same images? And does the model that wins on clean images still win on corrupted ones?</p></div>
 
 <h2>2 Objectives</h2>
 <p><b>O1. Measure real file sizes</b> and compare them with the formula, across bit-widths and five model sizes.</p>
-<p><b>O2. Build a fair race:</b> four compressed models of the same real size, each given the same 3000 training steps.</p>
-<p><b>O3. Compare how they fail:</b> on clean photos and on each kind of damage, photo by photo.</p>
-<p><b>O4. Rule out luck:</b> train each model three times and only count differences bigger than the run-to-run noise.</p>
-<p><b>O5. Build the P49 trade-off table:</b> accuracy, size and CPU speed side by side, stage by stage.</p>
+<p><b>O2. Build a fair race:</b> four compressed models of the same real size, each given the same 3000 steps of fine-tuning (short retraining after compression).</p>
+<p><b>O3. Compare how they fail:</b> on clean images and on each corruption type, image by image.</p>
+<p><b>O4. Rule out luck:</b> train each model with three random seeds and only count differences bigger than the seed-to-seed noise.</p>
+<p><b>O5. Build the P49 Pareto table:</b> accuracy, size and CPU latency side by side, stage by stage, showing which models no other model beats on every axis at once.</p>
 <table>
 <tr><th style="width:9%">Goal</th><th>Why it is still open</th></tr>
 <tr><td>O1</td><td>Language-model papers count the extra bytes. The vision papers I read use the formula, and none measures where it stops being accurate.</td></tr>
 <tr><td>O2</td><td>The closest study (Kuzmin et al., NeurIPS 2023) compares two methods at a size worked out on paper, not measured.</td></tr>
-<tr><td>O3–O4</td><td>Earlier studies compare one compressed model with its original. Method against method, at equal size, with run-to-run noise measured, I could not find.</td></tr>
+<tr><td>O3–O4</td><td>Earlier studies compare one compressed model with its original. Method against method, at equal size, with seed-to-seed noise measured, I could not find.</td></tr>
 </table>
 
 <h2>3 Novelty</h2>
 <p>I am not proposing a new compression method. Every method I use is published. What is new is a fair comparison:</p>
 <ul>
 <li><b>Equal real size.</b> Every file is measured on disk and tuned to about 9.8 MB, not estimated.</li>
-<li><b>Equal effort.</b> Same 3000 training steps for every model.</li>
-<li><b>Luck measured, not assumed.</b> Three runs per model show how much two runs of the same method disagree by chance.</li>
-<li><b>Failures by type.</b> Results reported per kind of damage, not as one average.</li>
+<li><b>Equal effort.</b> Same 3000 fine-tuning steps for every model.</li>
+<li><b>Luck measured, not assumed.</b> Three seeds per model show how much two runs of the same method disagree by chance.</li>
+<li><b>Failures by type.</b> Results reported per corruption type, not as one average.</li>
 </ul>
 
 <h2>4 Data and Reference Numbers: What Has Been Verified</h2>
 <table>
 <tr><th>What</th><th>Number</th><th>How it was checked</th></tr>
-<tr><td>DeiT-Small size</td><td>88.24 MB, 22,050,664 numbers</td><td>File written and measured; also rebuilt from the layer shapes</td></tr>
+<tr><td>DeiT-Small size</td><td>88.24 MB, 22,050,664 weights</td><td>File written and measured; also rebuilt from the layer shapes</td></tr>
 <tr><td>DeiT-Small accuracy</td><td>79.72% (published: 79.8%)</td><td>Re-measured in my own pipeline</td></tr>
 <tr><td>Formula error, 2-bit</td><td>+29.1% (DeiT-Small), +53.5% (DeiT-Tiny)</td><td>80 files across 5 models, each size also rebuilt by hand from shapes</td></tr>
 <tr><td>A published size</td><td>Mix-QViT's 11.4 MB</td><td>Rebuilt from the formula to within 0.03 MB; a real file built their way is 2–5% larger</td></tr>
@@ -83,38 +83,38 @@ figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; lin
 <p>Each model has one setting that I adjust until its file is about 9.77 MB. The search writes the real file, measures it, and repeats.</p>
 <table>
 <tr><th style="width:7%">Route</th><th>What it does</th><th>Setting adjusted</th><th>File</th></tr>
-<tr><td>A</td><td>Every number stored in 3 bits</td><td>How many numbers share one scale (36)</td><td>9.718 MB</td></tr>
-<tr><td>B</td><td>Every number becomes −1, 0 or +1, five packed per byte</td><td>How many sensitive layers stay at 8 bits (15)</td><td>9.785 MB</td></tr>
-<tr><td>C</td><td>4 bits, plus pruning</td><td>Share of channels deleted (24.4%)</td><td>9.796 MB</td></tr>
+<tr><td>A</td><td>Every weight stored in 3 bits</td><td>Group size: how many weights share one scale (36)</td><td>9.718 MB</td></tr>
+<tr><td>B</td><td>Ternary: every weight becomes −1, 0 or +1, five packed per byte</td><td>How many sensitive layers stay at 8 bits (15)</td><td>9.785 MB</td></tr>
+<tr><td>C</td><td>4 bits, plus structured pruning</td><td>Share of channels pruned (24.4%)</td><td>9.796 MB</td></tr>
 <tr><td>D</td><td>Distil into the smaller DeiT-Tiny, then 8 bits</td><td>How many layers stay at 16 bits (38)</td><td>9.765 MB</td></tr>
 </table>
-<p>After compression, every model is retrained for the same 3000 steps on 20% of the ImageNet training set, three times with different random starts.</p>
+<p>After compression, every model is fine-tuned for the same 3000 steps on 20% of the ImageNet training set, with three random seeds.</p>
 <figure><img src="figs/fig0_design.svg" style="width:82%"><figcaption><b>Figure 2.</b> The study: one starting model, four routes, the same size, the same training, the same tests.</figcaption></figure>
 
 <h2>6 Evaluation Protocol</h2>
 <table>
 <tr><th style="width:22%">Measure</th><th>What it tells us</th></tr>
-<tr><td>Clean accuracy</td><td>Share of the 50,000 test photos answered correctly</td></tr>
-<tr><td>Damaged accuracy</td><td>The same, on 14 kinds of damage (noise, blur, weather, digital), one at a time</td></tr>
-<tr><td>Which photos fail</td><td>Whether two models get the <i>same</i> photos wrong</td></tr>
-<tr><td>Honest confidence</td><td>When a model says "90% sure", is it right 90% of the time?</td></tr>
-<tr><td>File size, CPU speed</td><td>Real bytes on disk; time per photo on a normal processor</td></tr>
+<tr><td>Clean accuracy</td><td>Top-1: share of the 50,000 images where the first guess is right</td></tr>
+<tr><td>Corruption accuracy</td><td>The same, on each of the 14 corruptions, one at a time</td></tr>
+<tr><td>Failure overlap</td><td>Whether two models get the <i>same</i> images wrong</td></tr>
+<tr><td>Calibration</td><td>When a model says "90% sure", is it right 90% of the time?</td></tr>
+<tr><td>File size, CPU latency</td><td>Real bytes on disk; time per image on a normal processor</td></tr>
 </table>
-<p><b>Doing the statistics honestly.</b> Every model sees exactly the same photos, so I compare them photo by photo (McNemar's test). A gap only counts if it is larger than the gap between two runs of the same model. When many tests are run, each must pass a stricter bar (Bonferroni correction). I report ranges, not just "significant".</p>
+<p><b>Doing the statistics honestly.</b> Every model sees exactly the same images, so I compare them image by image (McNemar's test). A gap only counts if it is larger than the gap between two seeds of the same model. When many tests are run, each must pass a stricter bar (Bonferroni correction). I report ranges, not just "significant".</p>
 
 <h2>7 Work Plan and Gates</h2>
 <p>Most of the experimental work is already done. Each phase ends with a check that must pass.</p>
 <h3>Phase 0–2: Sizes, models, tests (done)</h3>
 <ul class="check">
 <li>✓ Real file sizes measured for 5 models; formula error found</li>
-<li>✓ Four models built at 9.72–9.80 MB, trained three times each</li>
-<li>✓ All tested on clean and damaged photos; run-to-run noise measured</li>
+<li>✓ Four models built at 9.72–9.80 MB, fine-tuned with three seeds each</li>
+<li>✓ All tested on clean and corrupted images; seed-to-seed noise measured</li>
 </ul>
 <h3>Phase 3: Re-check everything (done, Kaggle T4, 51 minutes)</h3>
 <ul class="check">
 <li>✓ Saved model files re-loaded and re-tested: 99.71% of answers match the original run</li>
 <li>✓ Uncompressed baseline measured: 79.72%, so the final model loses 3.2 points</li>
-<li>✓ CPU speed measured on a second processor (Intel)</li>
+<li>✓ CPU latency measured on a second processor (Intel)</li>
 <li>✓ One command (<code>reproduce.sh</code>) rebuilds every table in 45 seconds</li>
 </ul>
 <h3>Phase 4: Report (Weeks 6–9)</h3>
@@ -126,9 +126,9 @@ figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; lin
 </ul>
 
 <h2>8 Planned Figures</h2>
-<p>Figures 1–4 are drawn by a script from saved results. The report adds two more: the size gap across five model sizes, and confidence before and after correction.</p>
-<figure><img src="figs/fig3_two_rankings.svg" style="width:72%"><figcaption><b>Figure 3.</b> Rankings on clean and on damaged photos. A and C keep their places. B and D swap: B leads by about 1 point on clean photos, D leads by about 3.8 on damaged ones, in all three runs.</figcaption></figure>
-<figure><img src="figs/fig6_pareto.svg" style="width:62%"><figcaption><b>Figure 4.</b> Accuracy against CPU time per photo (Apple M2). A is the most accurate, D is 2.2 times faster, C sits between. B runs at the same speed as A but is 4 points less accurate.</figcaption></figure>
+<p>Figures 1–4 are drawn by a script from saved results. The report adds two more: the size gap across five model sizes, and calibration before and after correction.</p>
+<figure><img src="figs/fig3_two_rankings.svg" style="width:72%"><figcaption><b>Figure 3.</b> Rankings on clean and corrupted images. A and C keep their places. B and D swap: B leads by about 1 point on clean images, D leads by about 3.8 on corrupted ones, in all three seeds.</figcaption></figure>
+<figure><img src="figs/fig6_pareto.svg" style="width:62%"><figcaption><b>Figure 4.</b> Pareto plot: accuracy against CPU latency per image (Apple M2). A is the most accurate, D is 2.2 times faster, C sits between. B runs at the same speed as A but is 4 points less accurate.</figcaption></figure>
 
 <h2>9 Timeline</h2>
 <table>
@@ -143,23 +143,23 @@ figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; lin
 <table>
 <tr><th style="width:38%">If this happens</th><th>I will</th></tr>
 <tr><td>A paper already did this comparison</td><td>Cite it and narrow my claim to what it does not cover</td></tr>
-<tr><td>A difference is smaller than run-to-run noise</td><td>Report it as "no real difference"</td></tr>
+<tr><td>A difference is smaller than seed-to-seed noise</td><td>Report it as "no real difference"</td></tr>
 <tr><td>Time runs short</td><td>Drop the extra figures; the core results are already complete</td></tr>
 </table>
 <p><b>Limits I state up front.</b></p>
 <ul>
-<li>I compress the stored numbers only, not the calculations while the model runs, so my results must not be compared with papers that do both.</li>
-<li>Training used 20% of ImageNet for 3000 steps; with more training the ranking could change.</li>
+<li>I compress the weights only, not the activations (the numbers computed while the model runs), so my results must not be compared with papers that do both.</li>
+<li>Fine-tuning used 20% of ImageNet for 3000 steps; with more training the ranking could change.</li>
 <li>Route D uses a different, smaller network, so part of its behaviour may come from the network, not the compression.</li>
-<li>Ternary (B) sits 4–5 points below the trend line on noise in all three runs, but this does not pass the stricter test, so I report it as consistent, not proven.</li>
+<li>Ternary (B) sits 4–5 points below the trend line on noise in all three seeds, but this does not pass the stricter test, so I report it as consistent, not proven.</li>
 </ul>
 
 <h2>11 Expected Contributions</h2>
 <ul>
 <li><b>C1.</b> Real file sizes against the paper formula, showing where the formula stops being accurate.</li>
 <li><b>C2.</b> A fair comparison of four compression routes at the same real size and training effort.</li>
-<li><b>C3.</b> Evidence that equal-size models fail differently: routes disagree 1.2–2.0× more than two runs of the same route, and the clean-photo winner loses on damaged photos.</li>
-<li><b>C4.</b> The P49 trade-off table: accuracy, size and CPU speed for every route.</li>
+<li><b>C3.</b> Evidence that equal-size models fail differently: routes disagree 1.2–2.0× more than two seeds of the same route, and the clean-image winner loses on corrupted images.</li>
+<li><b>C4.</b> The P49 Pareto table: accuracy, size and CPU latency for every route.</li>
 <li><b>C5.</b> A repository where one command rebuilds every number.</li>
 </ul>
 
