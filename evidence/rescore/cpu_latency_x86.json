@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "machine": "Linux-6.18.48+-x86_64-with-glibc2.39",
+    "processor": "x86_64",
+    "torch": "2.11.0+cu128",
+    "timm": "1.0.29",
+    "qengine": "x86",
+    "runs": 50,
+    "warmup": 10,
+    "batch": 1
+  },
+  "rows": [
+    {
+      "model": "DeiT-S baseline (FP32, 88.2 MB)",
+      "params": 22050664,
+      "kind": "fp32",
+      "threads": 1,
+      "median_ms": 119.24913749999178,
+      "q1_ms": 115.7386604995736,
+      "q3_ms": 123.0532965000748
+    },
+    {
+      "model": "DeiT-S baseline (FP32, 88.2 MB)",
+      "params": 22050664,
+      "kind": "fp32",
+      "threads": 4,
+      "median_ms": 71.36562100004085,
+      "q1_ms": 69.90998724972997,
+      "q3_ms": 74.12179075004133
+    },
+    {
+      "model": "DeiT-S baseline (FP32, 88.2 MB)",
+      "params": 22050664,
+      "kind": "int8-dynamic",
+      "threads": 1,
+      "median_ms": 98.95000599999548,
+      "q1_ms": 95.28726374969665,
+      "q3_ms": 103.12248749983155
+    },
+    {
+      "model": "DeiT-S baseline (FP32, 88.2 MB)",
+      "params": 22050664,
+      "kind": "int8-dynamic",
+      "threads": 4,
+      "median_ms": 62.839621000421175,
+      "q1_ms": 60.85641549975662,
+      "q3_ms": 66.78042450016619
+    },
+    {
+      "model": "A / B: decode to DeiT-S",
+      "params": 22050664,
+      "kind": "fp32",
+      "threads": 1,
+      "median_ms": 119.24913749999178,
+      "q1_ms": 115.7386604995736,
+      "q3_ms": 123.0532965000748
+    },
+    {
+      "model": "A / B: decode to DeiT-S",
+      "params": 22050664,
+      "kind": "fp32",
+      "threads": 4,
+      "median_ms": 71.36562100004085,
+      "q1_ms": 69.90998724972997,
+      "q3_ms": 74.12179075004133
+    },
+    {
+      "model": "A / B: decode to DeiT-S",
+      "params": 22050664,
+      "kind": "int8-dynamic",
+      "threads": 1,
+      "median_ms": 98.95000599999548,
+      "q1_ms": 95.28726374969665,
+      "q3_ms": 103.12248749983155
+    },
+    {
+      "model": "A / B: decode to DeiT-S",
+      "params": 22050664,
+      "kind": "int8-dynamic",
+      "threads": 4,
+      "median_ms": 62.839621000421175,
+      "q1_ms": 60.85641549975662,
+      "q3_ms": 66.78042450016619
+    },
+    {
+      "model": "C: pruned DeiT-S (MLP 1162)",
+      "params": 18599392,
+      "kind": "fp32",
+      "threads": 1,
+      "median_ms": 103.67593550017773,
+      "q1_ms": 101.45910824985549,
+      "q3_ms": 110.78400074961792
+    },
+    {
+      "model": "C: pruned DeiT-S (MLP 1162)",
+      "params": 18599392,
+      "kind": "fp32",
+      "threads": 4,
+      "median_ms": 64.100695500656,
+      "q1_ms": 62.15290975001153,
+      "q3_ms": 66.67374325047604
+    },
+    {
+      "model": "C: pruned DeiT-S (MLP 1162)",
+      "params": 18599392,
+      "kind": "int8-dynamic",
+      "threads": 1,
+      "median_ms": 86.91411200015864,
+      "q1_ms": 84.40174575025594,
+      "q3_ms": 91.24248425041515
+    },
+    {
+      "model": "C: pruned DeiT-S (MLP 1162)",
+      "params": 18599392,
+      "kind": "int8-dynamic",
+      "threads": 4,
+      "median_ms": 57.85670649993335,
+      "q1_ms": 55.88209250026921,
+      "q3_ms": 61.07000400038487
+    },
+    {
+      "model": "D: DeiT-Tiny",
+      "params": 5717416,
+      "kind": "fp32",
+      "threads": 1,
+      "median_ms": 40.15287750007701,
+      "q1_ms": 39.11110400031248,
+      "q3_ms": 42.21824725004808
+    },
+    {
+      "model": "D: DeiT-Tiny",
+      "params": 5717416,
+      "kind": "fp32",
+      "threads": 4,
+      "median_ms": 29.947139999876526,
+      "q1_ms": 28.9343042497876,
+      "q3_ms": 31.087407750192142
+    },
+    {
+      "model": "D: DeiT-Tiny",
+      "params": 5717416,
+      "kind": "int8-dynamic",
+      "threads": 1,
+      "median_ms": 38.51703700001963,
+      "q1_ms": 38.068836500087855,
+      "q3_ms": 40.5799537504663
+    },
+    {
+      "model": "D: DeiT-Tiny",
+      "params": 5717416,
+      "kind": "int8-dynamic",
+      "threads": 4,
+      "median_ms": 30.277328499778378,
+      "q1_ms": 29.197102999660274,
+      "q3_ms": 31.514760750042115
+    }
+  ]
+}

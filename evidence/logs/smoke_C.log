@@ -1,0 +1,13 @@
+ChotaDeiT-C: 50 layers fake-quantized | knob=0.2437 | 20 steps
+  data: 200 train shards, 64 val shards
+/usr/local/lib/python3.10/dist-packages/webdataset/compat.py:381: UserWarning: set WebDataset(shardshuffle=...) to a positive integer or 0 or False
+  warnings.warn("set WebDataset(shardshuffle=...) to a positive integer or 0 or False")
+  step 5/20  loss 2.097  0.0 it/s
+  step 10/20  loss 2.062  0.1 it/s
+  step 15/20  loss 2.147  0.1 it/s
+  step 20/20  loss 2.152  0.1 it/s
+  >> step 20: top-1 (40 batches) = 72.02%
+  (final eval over 100 batches = 25,600 images)
+
+FINAL top-1: 71.84%
+Exported models/ChotaDeiT-C.bin: 9.796 MB (target 9.796)

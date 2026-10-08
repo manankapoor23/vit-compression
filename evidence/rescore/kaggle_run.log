@@ -1,0 +1,295 @@
+8.3s 1 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.3s 2 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.3s 3 0.00s - to python to disable frozen modules.
+8.3s 4 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+8.9s 5 0.00s - Debugger warning: It seems that frozen modules are being used, which may
+8.9s 6 0.00s - make the debugger miss breakpoints. Please pass -Xfrozen_modules=off
+8.9s 7 0.00s - to python to disable frozen modules.
+8.9s 8 0.00s - Note: Debugging will proceed. Set PYDEVD_DISABLE_FILE_VALIDATION=1 to disable this validation.
+12.2s 9 patched
+15.1s 10 [?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/75.0 kB[0m [31m?[0m eta [36m-:--:--[0m[2K   [91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[90m╺[0m[90m━[0m [32m71.7/75.0 kB[0m [31m6.3 MB/s[0m eta [36m0:00:01[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m75.0/75.0 kB[0m [31m1.8 MB/s[0m eta [36m0:00:00[0m
+15.2s 11 [?25h[?25l   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.0/2.1 MB[0m [31m?[0m eta [36m-:--:--[0m[2K   [91m━━━━━━━━━━━━[0m[91m╸[0m[90m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m0.7/2.1 MB[0m [31m20.1 MB/s[0m eta [36m0:00:01[0m[2K   [91m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m[91m╸[0m [32m2.1/2.1 MB[0m [31m35.5 MB/s[0m eta [36m0:00:01[0m[2K   [90m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m [32m2.1/2.1 MB[0m [31m24.9 MB/s[0m eta [36m0:00:00[0m
+19.8s 12 [?25h[90mHint: A new version of huggingface_hub (2.1.1) is available! You are using version 1.29.0.
+19.8s 13 To update, run: hf update[0m
+19.8s 14 [90mHint: The `hf-cli` skill is not installed. Run `hf skills add -g --claude` to teach your AI agents how to use the `hf` CLI.[0m
+20.4s 15 Downloading bytes:                                          |  0.00B
+20.4s 16 Reconstructing (incomplete total...): |            |  0.00B /  0.00B            [A
+20.4s 17 
+20.6s 18 Fetching 64 files:   0%|                                 | 0/64 [00:00<?, ?it/s][A[A
+20.6s 19 Reconstructing (incomplete total...):   0%|        |  0.00B /  109MB            [A
+20.6s 20 Reconstructing (incomplete total...):   0%|        |  0.00B /  324MB            [A
+20.6s 21 Reconstructing (incomplete total...):   0%|        |  0.00B /  539MB            [A
+20.6s 22 Reconstructing (incomplete total...):   0%|        |  0.00B /  757MB            [A
+20.6s 23 Reconstructing (incomplete total...):   0%|        |  0.00B /  865MB            [A
+20.6s 24 Reconstructing (incomplete total...):   0%|        |  0.00B /  865MB            [A
+20.6s 25 Reconstructing (incomplete total...):   0%|        |  0.00B /  865MB            [A
+22.8s 26 Reconstructing (incomplete total...):   0%|        |  0.00B /  865MB            [ADownloading bytes:                                          | 16.9kB            Downloading bytes: ▍                                        | 10.3MB, 13.7kB/s  Downloading bytes: █▌                                       | 34.1MB, 10.7MB/s  Downloading bytes: ███▋                                     | 77.2MB, 39.9MB/s  Downloading bytes: ████▉                                    |  103MB,  101MB/s  Downloading bytes: ██████▎                                  |  132MB,  129MB/s  Downloading bytes: ███████▊                                 |  165MB,  162MB/s  Downloading bytes: █████████                                |  191MB,  150MB/s  Downloading bytes: ██████████▉                              |  230MB,  171MB/s  Downloading bytes: █████████████▏                           |  279MB,  220MB/s  Downloading bytes: ██████████████▉                          |  315MB,  284MB/s
+22.8s 27 Reconstructing (incomplete total...):  12%|▉       |  106MB /  865MB            [A
+22.8s 28 
+22.8s 29 Fetching 64 files:   2%|▍                        | 1/64 [00:02<02:33,  2.43s/it][A[A
+23.0s 30 Reconstructing (incomplete total...):  11%|▊       |  106MB /  971MB, 44.0MB/s  [A
+23.0s 31 Reconstructing (incomplete total...):  22%|█▊      |  216MB /  971MB, 44.0MB/s  [A
+23.0s 32 
+23.0s 33 Fetching 64 files:   3%|▊                        | 2/64 [00:02<01:07,  1.09s/it][A[A
+23.5s 34 Reconstructing (incomplete total...):  20%|█▌      |  216MB / 1.08GB, 99.3MB/s  [ADownloading bytes: █████████████▊                           |  363MB,  297MB/s
+23.5s 35 Reconstructing (incomplete total...):  31%|██▍     |  330MB / 1.08GB, 99.3MB/s  [A
+23.5s 36 
+23.5s 37 Fetching 64 files:   5%|█▏                       | 3/64 [00:03<00:50,  1.20it/s][A[A
+24.3s 38 Reconstructing (incomplete total...):  28%|██▏     |  330MB / 1.19GB,  133MB/s  [A
+26.0s 39 Reconstructing (incomplete total...):  32%|██▌     |  384MB / 1.19GB,  133MB/s  [ADownloading bytes: █████████████▉                           |  401MB,  248MB/s
+26.0s 40 Reconstructing (incomplete total...):  36%|██▉     |  431MB / 1.19GB,  106MB/s  [A
+26.0s 41 
+26.0s 42 Fetching 64 files:   6%|█▌                       | 4/64 [00:05<01:30,  1.50s/it][A[A
+26.4s 43 Reconstructing (incomplete total...):  33%|██▋     |  431MB / 1.29GB, 64.3MB/s  [ADownloading bytes: █████████████▌                           |  428MB, 50.7MB/s  Downloading bytes: ██████████████▋                          |  462MB, 41.9MB/s
+26.5s 44 Reconstructing (incomplete total...):  34%|██▊     |  447MB / 1.29GB, 64.3MB/s  [ADownloading bytes: ████████████████▍                        |  521MB, 56.5MB/s
+26.6s 45 Reconstructing (incomplete total...):  36%|██▊     |  461MB / 1.29GB, 61.3MB/s  [A
+26.9s 46 Reconstructing (incomplete total...):  37%|██▉     |  485MB / 1.29GB, 65.4MB/s  [ADownloading bytes: █████████████████▋                       |  558MB, 90.8MB/s  Downloading bytes: ██████████████████▌                      |  588MB,  106MB/s  Downloading bytes: ███████████████████▍                     |  615MB,  119MB/s
+27.1s 47 Reconstructing (incomplete total...):  39%|███▏    |  507MB / 1.29GB, 77.5MB/s  [ADownloading bytes: ████████████████████▉                    |  661MB,  137MB/s  Downloading bytes: █████████████████████▌                   |  682MB,  332MB/s  Downloading bytes: █████████████████████▌                   |  682MB,  332MB/s
+27.1s 48 Reconstructing (incomplete total...):  48%|███▊    |  615MB / 1.29GB, 77.1MB/s  [A
+27.1s 49 
+27.1s 50 Fetching 64 files:   8%|█▉                       | 5/64 [00:06<01:18,  1.33s/it][A[A
+27.2s 51 Reconstructing (incomplete total...):  44%|███▍    |  615MB / 1.41GB,  167MB/s  [ADownloading bytes: █████████████████████▍                   |  736MB,  332MB/s
+27.2s 52 Reconstructing (incomplete total...):  46%|███▋    |  650MB / 1.41GB,  167MB/s  [A
+27.2s 53 
+27.2s 54 Fetching 64 files:   9%|██▎                      | 6/64 [00:06<00:54,  1.07it/s][A[ADownloading bytes: ██████████████████████▉                  |  788MB,  375MB/s
+27.5s 55 Reconstructing (incomplete total...):  43%|███▍    |  650MB / 1.52GB,  174MB/s  [ADownloading bytes: ██████████████████████▋                  |  838MB,  385MB/s  Downloading bytes: ████████████████████████▍                |  905MB,  414MB/s
+27.5s 56 Reconstructing (incomplete total...):  50%|███▉    |  757MB / 1.52GB,  174MB/s  [A
+27.5s 57 
+27.5s 58 Fetching 64 files:  11%|██▋                      | 7/64 [00:07<00:40,  1.39it/s][A[A
+27.5s 59 Reconstructing (incomplete total...):  53%|████▎   |  865MB / 1.62GB,  243MB/s  [A
+27.8s 60 Reconstructing (incomplete total...):  50%|███▉    |  865MB / 1.74GB,  243MB/s  [ADownloading bytes: ██████████████████████▉                  |  970MB,  477MB/s  Downloading bytes: ████████████████████████▏                | 1.03GB,  445MB/s
+28.2s 61 Reconstructing (incomplete total...):  54%|████▎   |  932MB / 1.74GB,  243MB/s  [ADownloading bytes: █████████████████████████▍               | 1.08GB,  426MB/s
+28.4s 62 Reconstructing (incomplete total...):  56%|████▌   |  982MB / 1.74GB,  346MB/s  [A
+28.5s 63 Reconstructing (incomplete total...):  63%|█████   | 1.09GB / 1.74GB,  262MB/s  [A
+29.2s 64 Reconstructing (incomplete total...):  66%|█████▎  | 1.14GB / 1.74GB,  310MB/s  [ADownloading bytes: ██████████████████████████▌              | 1.13GB,  294MB/s
+29.5s 65 Reconstructing (incomplete total...):  68%|█████▍  | 1.19GB / 1.74GB,  324MB/s  [ADownloading bytes: ███████████████████████████▍             | 1.16GB,  131MB/s
+29.5s 66 
+29.5s 67 Fetching 64 files:  14%|███▌                     | 9/64 [00:09<00:46,  1.18it/s][A[A
+29.5s 68 Reconstructing (incomplete total...):  64%|█████▏  | 1.19GB / 1.84GB,  193MB/s  [A
+29.5s 69 Reconstructing (incomplete total...):  61%|████▊   | 1.19GB / 1.95GB,  193MB/s  [A
+29.9s 70 Reconstructing (incomplete total...):  57%|████▌   | 1.19GB / 2.07GB,  193MB/s  [ADownloading bytes: ███████████████████████▋                 | 1.19GB,  118MB/s
+30.8s 71 Reconstructing (incomplete total...):  61%|████▊   | 1.25GB / 2.07GB,  193MB/s  [ADownloading bytes: ████████████████████████                 | 1.22GB,  122MB/s  Downloading bytes: ████████████████████████▌                | 1.24GB, 92.9MB/s  Downloading bytes: █████████████████████████                | 1.26GB, 71.9MB/s
+31.4s 72 Reconstructing (incomplete total...):  63%|█████   | 1.29GB / 2.07GB,  146MB/s  [ADownloading bytes: █████████████████████████▍               | 1.28GB, 90.2MB/s  Downloading bytes: █████████████████████████▋               | 1.30GB, 90.7MB/s
+31.7s 73 Reconstructing (incomplete total...):  66%|█████▎  | 1.36GB / 2.07GB,  100MB/s  [ADownloading bytes: ██████████████████████████▏              | 1.32GB, 87.4MB/s  Downloading bytes: ██████████████████████████▍              | 1.33GB, 83.7MB/s
+31.7s 74 
+31.7s 75 Fetching 64 files:  19%|████▌                   | 12/64 [00:11<00:41,  1.26it/s][A[A
+31.9s 76 Reconstructing (incomplete total...):  63%|█████   | 1.36GB / 2.18GB,  107MB/s  [ADownloading bytes: █████████████████████████▍               | 1.35GB, 88.3MB/s  Downloading bytes: █████████████████████████▉               | 1.37GB, 83.9MB/s
+31.9s 77 Reconstructing (incomplete total...):  65%|█████▏  | 1.41GB / 2.18GB,  107MB/s  [A
+31.9s 78 
+31.9s 79 Fetching 64 files:  20%|████▉                   | 13/64 [00:11<00:34,  1.47it/s][A[A
+33.1s 80 Reconstructing (incomplete total...):  62%|████▉   | 1.41GB / 2.29GB, 99.4MB/s  [ADownloading bytes: █████████████████████████▎               | 1.41GB,  109MB/s  Downloading bytes: █████████████████████████▊               | 1.44GB, 80.0MB/s  Downloading bytes: ██████████████████████████▎              | 1.47GB,  106MB/s  Downloading bytes: ██████████████████████████▉              | 1.50GB,  101MB/s
+33.1s 81 Reconstructing (incomplete total...):  66%|█████▎  | 1.52GB / 2.29GB, 99.4MB/s  [ADownloading bytes: ███████████████████████████▌             | 1.54GB,  136MB/s
+33.1s 82 
+33.1s 83 Fetching 64 files:  22%|█████▎                  | 14/64 [00:12<00:39,  1.25it/s][A[A
+33.4s 84 Reconstructing (incomplete total...):  63%|█████   | 1.52GB / 2.39GB, 94.7MB/s  [ADownloading bytes: ██████████████████████████▉              | 1.57GB,  169MB/s  Downloading bytes: ███████████████████████████▌             | 1.61GB,  201MB/s
+33.4s 85 Reconstructing (incomplete total...):  68%|█████▍  | 1.63GB / 2.39GB, 94.7MB/s  [A
+33.4s 86 
+33.4s 87 Fetching 64 files:  23%|█████▋                  | 15/64 [00:13<00:33,  1.46it/s][A[A
+34.0s 88 Reconstructing (incomplete total...):  65%|█████▏  | 1.63GB / 2.50GB,  134MB/s  [ADownloading bytes: ██████████████████████████▊              | 1.63GB,  190MB/s
+34.1s 89 Reconstructing (incomplete total...):  68%|█████▍  | 1.70GB / 2.50GB,  134MB/s  [ADownloading bytes: ███████████████████████████▏             | 1.66GB,  127MB/s
+34.2s 90 Reconstructing (incomplete total...):  70%|█████▌  | 1.74GB / 2.50GB,  130MB/s  [ADownloading bytes: ███████████████████████████▋             | 1.69GB,  125MB/s
+34.2s 91 
+34.2s 92 Fetching 64 files:  25%|██████                  | 16/64 [00:13<00:33,  1.45it/s][A[A
+34.8s 93 Reconstructing (incomplete total...):  67%|█████▎  | 1.74GB / 2.60GB,  147MB/s  [ADownloading bytes: ███████████████████████████▏             | 1.72GB,  149MB/s  Downloading bytes: ████████████████████████████▎            | 1.80GB,  188MB/s  Downloading bytes: █████████████████████████████▌           | 1.87GB,  297MB/s  Downloading bytes: █████████████████████████████▊           | 1.89GB,  536MB/s  Downloading bytes: ██████████████████████████████▊          | 1.96GB,  536MB/s  Downloading bytes: ███████████████████████████████          | 1.97GB,  632MB/s  Downloading bytes: ████████████████████████████████▏        | 2.05GB,  632MB/s  Downloading bytes: █████████████████████████████████▌       | 2.13GB,  656MB/s
+35.0s 94 Reconstructing (incomplete total...):  71%|█████▋  | 1.85GB / 2.60GB,  147MB/s  [ADownloading bytes: ██████████████████████████████████▊      | 2.21GB,  701MB/s  Downloading bytes: ████████████████████████████████████▏    | 2.30GB,  708MB/s  Downloading bytes: ████████████████████████████████████▍    | 2.31GB,  800MB/s
+35.1s 95 Reconstructing (incomplete total...):  75%|██████  | 1.96GB / 2.60GB,  147MB/s  [A
+35.3s 96 Reconstructing (incomplete total...):  83%|██████▋ | 2.17GB / 2.60GB,  213MB/s  [ADownloading bytes: █████████████████████████████████████▊   | 2.40GB,  800MB/s
+35.3s 97 
+35.3s 98 Fetching 64 files:  27%|██████▍                 | 17/64 [00:14<00:37,  1.25it/s][A[A
+35.3s 99 Reconstructing (incomplete total...):  92%|███████▎| 2.39GB / 2.60GB,  387MB/s  [A
+35.3s 100 Reconstructing (incomplete total...):  88%|███████ | 2.39GB / 2.71GB,  549MB/s  [A
+35.3s 101 Reconstructing (incomplete total...):  82%|██████▌ | 2.39GB / 2.93GB,  549MB/s  [A
+35.3s 102 Reconstructing (incomplete total...):  82%|██████▌ | 2.39GB / 2.93GB,  549MB/s  [A
+35.3s 103 Reconstructing (incomplete total...):  79%|██████▎ | 2.39GB / 3.03GB,  549MB/s  [A
+35.3s 104 Reconstructing (incomplete total...):  76%|██████  | 2.39GB / 3.15GB,  549MB/s  [A
+35.5s 105 Reconstructing (incomplete total...):  74%|█████▉  | 2.39GB / 3.25GB,  549MB/s  [A
+35.5s 106 Reconstructing (incomplete total...):  77%|██████▏ | 2.50GB / 3.25GB,  549MB/s  [A
+35.5s 107 
+35.5s 108 Fetching 64 files:  36%|████████▋               | 23/64 [00:15<00:11,  3.70it/s][A[A
+36.0s 109 Reconstructing (incomplete total...):  74%|█████▉  | 2.50GB / 3.37GB,  543MB/s  [ADownloading bytes: ██████████████████████████████           | 2.47GB,  635MB/s
+36.0s 110 Reconstructing (incomplete total...):  77%|██████▏ | 2.60GB / 3.37GB,  543MB/s  [A
+36.0s 111 
+36.0s 112 Fetching 64 files:  38%|█████████               | 24/64 [00:15<00:12,  3.24it/s][A[A
+36.9s 113 Reconstructing (incomplete total...):  75%|█████▉  | 2.60GB / 3.47GB,  377MB/s  [ADownloading bytes: █████████████████████████████▊           | 2.53GB,  354MB/s  Downloading bytes: ██████████████████████████████▊          | 2.61GB,  200MB/s  Downloading bytes: ███████████████████████████████▌         | 2.68GB,  265MB/s  Downloading bytes: ████████████████████████████████▌        | 2.76GB,  312MB/s  Downloading bytes: █████████████████████████████████▋       | 2.85GB,  395MB/s  Downloading bytes: ██████████████████████████████████▌      | 2.93GB,  476MB/s
+37.0s 114 Reconstructing (incomplete total...):  77%|██████▏ | 2.67GB / 3.47GB,  377MB/s  [A
+37.1s 115 Reconstructing (incomplete total...):  81%|██████▍ | 2.82GB / 3.47GB,  220MB/s  [ADownloading bytes: ███████████████████████████████████▊     | 3.03GB,  541MB/s
+37.2s 116 Reconstructing (incomplete total...):  84%|██████▋ | 2.92GB / 3.47GB,  317MB/s  [A
+37.4s 117 Reconstructing (incomplete total...):  87%|██████▉ | 3.03GB / 3.47GB,  389MB/s  [ADownloading bytes: ████████████████████████████████████▋    | 3.11GB,  572MB/s
+37.7s 118 Reconstructing (incomplete total...):  90%|███████▏| 3.12GB / 3.47GB,  468MB/s  [A
+40.3s 119 Reconstructing (incomplete total...):  94%|███████▍| 3.25GB / 3.47GB,  442MB/s  [ADownloading bytes: █████████████████████████████████████▍   | 3.17GB,  460MB/s  Downloading bytes: ██████████████████████████████████████   | 3.22GB,  233MB/s  Downloading bytes: ██████████████████████████████████████▌  | 3.26GB,  180MB/s  Downloading bytes: ██████████████████████████████████████▉  | 3.30GB,  169MB/s  Downloading bytes: ███████████████████████████████████████▎ | 3.33GB,  153MB/s
+40.3s 120 
+40.3s 121 Fetching 64 files:  39%|█████████▍              | 25/64 [00:19<00:38,  1.02it/s][A[A
+40.4s 122 Reconstructing (incomplete total...):  91%|███████▏| 3.25GB / 3.59GB,  462MB/s  [A
+40.4s 123 Reconstructing (incomplete total...):  94%|███████▍| 3.37GB / 3.59GB,  462MB/s  [A
+40.4s 124 Reconstructing (incomplete total...):  94%|███████▍| 3.46GB / 3.70GB,  118MB/s  [A
+40.4s 125 Reconstructing (incomplete total...):  91%|███████▎| 3.47GB / 3.81GB,  118MB/s  [A
+40.4s 126 Reconstructing (incomplete total...):  89%|███████ | 3.47GB / 3.92GB,  118MB/s  [A
+40.4s 127 Reconstructing (incomplete total...):  86%|██████▉ | 3.47GB / 4.03GB,  118MB/s  [A
+40.4s 128 Reconstructing (incomplete total...):  84%|██████▋ | 3.47GB / 4.14GB,  118MB/s  [A
+40.4s 129 Reconstructing (incomplete total...):  82%|██████▌ | 3.47GB / 4.24GB,  118MB/s  [A
+41.9s 130 Reconstructing (incomplete total...):  80%|██████▍ | 3.47GB / 4.35GB,  118MB/s  [ADownloading bytes: ███████████████████████████████▋         | 3.36GB,  138MB/s  Downloading bytes: ███████████████████████████████▉         | 3.39GB, 52.4MB/s  Downloading bytes: ████████████████████████████████▍        | 3.44GB, 66.9MB/s  Downloading bytes: █████████████████████████████████▏       | 3.51GB, 95.2MB/s  Downloading bytes: █████████████████████████████████▊       | 3.58GB,  155MB/s  Downloading bytes: ██████████████████████████████████▌      | 3.67GB,  215MB/s  Downloading bytes: ███████████████████████████████████▎     | 3.74GB,  305MB/s
+42.1s 131 Reconstructing (incomplete total...):  82%|██████▌ | 3.58GB / 4.35GB,  118MB/s  [ADownloading bytes: ███████████████████████████████████▉     | 3.82GB,  376MB/s  Downloading bytes: ████████████████████████████████████▌    | 3.88GB,  409MB/s
+42.2s 132 Reconstructing (incomplete total...):  84%|██████▋ | 3.65GB / 4.35GB,  126MB/s  [A
+42.4s 133 Reconstructing (incomplete total...):  85%|██████▊ | 3.69GB / 4.35GB,  139MB/s  [ADownloading bytes: █████████████████████████████████████▏   | 3.95GB,  456MB/s
+42.5s 134 Reconstructing (incomplete total...):  89%|███████▏| 3.88GB / 4.35GB,  154MB/s  [A
+42.6s 135 Reconstructing (incomplete total...):  93%|███████▍| 4.02GB / 4.35GB,  256MB/s  [ADownloading bytes: █████████████████████████████████████▊   | 4.01GB,  381MB/s
+43.1s 136 Reconstructing (incomplete total...):  95%|███████▌| 4.13GB / 4.35GB,  344MB/s  [ADownloading bytes: ██████████████████████████████████████▏  | 4.05GB,  301MB/s
+43.4s 137 Reconstructing (incomplete total...):  97%|███████▊| 4.24GB / 4.35GB,  401MB/s  [ADownloading bytes: ██████████████████████████████████████▉  | 4.13GB,  243MB/s
+44.2s 138 Reconstructing (incomplete total...): 100%|███████▉| 4.34GB / 4.35GB,  336MB/s  [ADownloading bytes: ███████████████████████████████████████▏ | 4.16GB,  222MB/s
+44.2s 139 
+44.2s 140 Fetching 64 files:  52%|████████████▍           | 33/64 [00:23<00:20,  1.53it/s][A[A
+44.2s 141 Reconstructing (incomplete total...):  98%|███████▊| 4.35GB / 4.46GB,  335MB/s  [A
+44.2s 142 Reconstructing (incomplete total...):  95%|███████▌| 4.35GB / 4.58GB,  335MB/s  [A
+44.2s 143 Reconstructing (incomplete total...):  93%|███████▍| 4.35GB / 4.69GB,  335MB/s  [A
+44.2s 144 Reconstructing (incomplete total...):  91%|███████▏| 4.35GB / 4.80GB,  335MB/s  [A
+44.2s 145 Reconstructing (incomplete total...):  89%|███████ | 4.35GB / 4.91GB,  335MB/s  [A
+44.2s 146 Reconstructing (incomplete total...):  87%|██████▉ | 4.35GB / 5.02GB,  335MB/s  [A
+44.2s 147 Reconstructing (incomplete total...):  85%|██████▊ | 4.35GB / 5.13GB,  335MB/s  [A
+45.8s 148 Reconstructing (incomplete total...):  83%|██████▋ | 4.35GB / 5.25GB,  335MB/s  [ADownloading bytes: ████████████████████████████████▊        | 4.20GB,  235MB/s  Downloading bytes: █████████████████████████████████        | 4.24GB, 71.9MB/s  Downloading bytes: █████████████████████████████████▌       | 4.30GB, 91.9MB/s  Downloading bytes: ██████████████████████████████████       | 4.37GB,  131MB/s  Downloading bytes: ██████████████████████████████████▌      | 4.43GB,  183MB/s  Downloading bytes: ███████████████████████████████████▏     | 4.50GB,  242MB/s
+45.9s 149 Reconstructing (incomplete total...):  85%|██████▊ | 4.46GB / 5.25GB,  335MB/s  [ADownloading bytes: ███████████████████████████████████▊     | 4.58GB,  311MB/s  Downloading bytes: ████████████████████████████████████▍    | 4.67GB,  370MB/s
+46.0s 150 Reconstructing (incomplete total...):  87%|██████▉ | 4.58GB / 5.25GB,  122MB/s  [A
+46.3s 151 Reconstructing (incomplete total...):  90%|███████▏| 4.75GB / 5.25GB,  163MB/s  [A
+46.9s 152 Reconstructing (incomplete total...):  94%|███████▍| 4.92GB / 5.25GB,  244MB/s  [ADownloading bytes: ████████████████████████████████████▉    | 4.73GB,  463MB/s  Downloading bytes: █████████████████████████████████████▍   | 4.80GB,  337MB/s  Downloading bytes: █████████████████████████████████████▊   | 4.84GB,  331MB/s  Downloading bytes: ██████████████████████████████████████▏  | 4.89GB,  348MB/s
+47.3s 153 Reconstructing (incomplete total...):  96%|███████▋| 5.03GB / 5.25GB,  339MB/s  [ADownloading bytes: ██████████████████████████████████████▌  | 4.94GB,  268MB/s  Downloading bytes: ██████████████████████████████████████▉  | 4.98GB,  261MB/s  Downloading bytes: ███████████████████████████████████████▏ | 5.02GB,  291MB/s
+47.4s 154 Reconstructing (incomplete total...):  98%|███████▊| 5.12GB / 5.25GB,  277MB/s  [A
+48.9s 155 Reconstructing (incomplete total...): 100%|███████▉| 5.23GB / 5.25GB,  252MB/s  [A
+48.9s 156 
+48.9s 157 Fetching 64 files:  64%|███████████████▍        | 41/64 [00:28<00:14,  1.61it/s][A[A
+48.9s 158 Reconstructing (incomplete total...):  98%|███████▊| 5.25GB / 5.36GB,  320MB/s  [A
+48.9s 159 Reconstructing (incomplete total...):  96%|███████▋| 5.25GB / 5.47GB,  320MB/s  [A
+48.9s 160 Reconstructing (incomplete total...):  94%|███████▌| 5.25GB / 5.58GB,  320MB/s  [A
+48.9s 161 Reconstructing (incomplete total...):  92%|███████▍| 5.25GB / 5.69GB,  320MB/s  [A
+48.9s 162 Reconstructing (incomplete total...):  90%|███████▏| 5.25GB / 5.81GB,  320MB/s  [A
+48.9s 163 Reconstructing (incomplete total...):  89%|███████ | 5.25GB / 5.92GB,  320MB/s  [A
+48.9s 164 Reconstructing (incomplete total...):  87%|██████▉ | 5.25GB / 6.03GB,  320MB/s  [A
+50.4s 165 Reconstructing (incomplete total...):  86%|██████▊ | 5.25GB / 6.14GB,  320MB/s  [ADownloading bytes: █████████████████████████████████▊       | 5.06GB,  265MB/s  Downloading bytes: ██████████████████████████████████▏      | 5.12GB, 52.3MB/s  Downloading bytes: ██████████████████████████████████▋      | 5.19GB, 77.0MB/s  Downloading bytes: ███████████████████████████████████▎     | 5.29GB,  119MB/s  Downloading bytes: ███████████████████████████████████▊     | 5.37GB,  192MB/s  Downloading bytes: ████████████████████████████████████▍    | 5.45GB,  252MB/s  Downloading bytes: █████████████████████████████████████    | 5.55GB,  333MB/s
+50.5s 166 Reconstructing (incomplete total...):  87%|██████▉ | 5.36GB / 6.14GB,  320MB/s  [A
+50.5s 167 
+50.5s 168 Fetching 64 files:  77%|██████████████████▍     | 49/64 [00:30<00:06,  2.23it/s][A[A
+50.7s 169 Reconstructing (incomplete total...):  86%|██████▊ | 5.36GB / 6.24GB,  105MB/s  [ADownloading bytes: ████████████████████████████████████▉    | 5.63GB,  423MB/s  Downloading bytes: █████████████████████████████████████▍   | 5.70GB,  480MB/s
+50.7s 170 Reconstructing (incomplete total...):  88%|███████ | 5.48GB / 6.24GB,  105MB/s  [A
+50.7s 171 
+50.7s 172 Fetching 64 files:  78%|██████████████████▊     | 50/64 [00:30<00:06,  2.30it/s][A[A
+52.9s 173 Reconstructing (incomplete total...):  86%|██████▉ | 5.48GB / 6.35GB,  136MB/s  [ADownloading bytes: █████████████████████████████████████▎   | 5.79GB,  532MB/s  Downloading bytes: █████████████████████████████████████▉   | 5.87GB,  592MB/s  Downloading bytes: ██████████████████████████████████████▎  | 5.94GB,  489MB/s
+53.0s 174 Reconstructing (incomplete total...):  87%|██████▉ | 5.59GB / 6.46GB,  136MB/s  [A
+53.1s 175 Reconstructing (incomplete total...):  88%|███████ | 5.66GB / 6.46GB,  136MB/s  [A
+54.4s 176 Reconstructing (incomplete total...):  95%|███████▌| 6.13GB / 6.46GB,  106MB/s  [ADownloading bytes: ██████████████████████████████████████   | 6.01GB,  249MB/s  Downloading bytes: ██████████████████████████████████████▎  | 6.04GB, 85.9MB/s  Downloading bytes: ██████████████████████████████████████▋  | 6.10GB, 99.2MB/s  Downloading bytes: ██████████████████████████████████████▉  | 6.13GB,  123MB/s  Downloading bytes: ███████████████████████████████████████  | 6.17GB,  138MB/s
+54.4s 177 
+54.4s 178 Fetching 64 files:  81%|███████████████████▌    | 52/64 [00:33<00:07,  1.51it/s][A[A
+54.4s 179 Reconstructing (incomplete total...):  98%|███████▊| 6.35GB / 6.46GB,  254MB/s  [A
+54.4s 180 Reconstructing (incomplete total...):  97%|███████▋| 6.35GB / 6.57GB,  222MB/s  [A
+54.4s 181 Reconstructing (incomplete total...):  95%|███████▌| 6.35GB / 6.68GB,  222MB/s  [A
+54.4s 182 Reconstructing (incomplete total...):  93%|███████▍| 6.35GB / 6.79GB,  222MB/s  [A
+54.4s 183 Reconstructing (incomplete total...):  92%|███████▎| 6.35GB / 6.90GB,  222MB/s  [A
+54.7s 184 Reconstructing (incomplete total...):  91%|███████▎| 6.35GB / 7.00GB,  222MB/s  [A
+54.7s 185 
+55.9s 186 Fetching 64 files:  92%|██████████████████████▏ | 59/64 [00:34<00:01,  2.58it/s][A[ADownloading bytes: ████████████████████████████████████▎    | 6.20GB,  151MB/s  Downloading bytes: ████████████████████████████████████▍    | 6.23GB, 89.7MB/s  Downloading bytes: ████████████████████████████████████▉    | 6.30GB,  102MB/s  Downloading bytes: █████████████████████████████████████▎   | 6.38GB,  157MB/s  Downloading bytes: █████████████████████████████████████▊   | 6.46GB,  241MB/s  Downloading bytes: ██████████████████████████████████████▏  | 6.53GB,  324MB/s
+58.9s 187 Reconstructing (incomplete total...):  94%|███████▌| 6.57GB / 7.00GB,  222MB/s  [ADownloading bytes: ██████████████████████████████████████▌  | 6.59GB,  360MB/s  Downloading bytes: ██████████████████████████████████████▉  | 6.66GB,  384MB/s
+58.9s 188 Reconstructing (incomplete total...):  95%|███████▋| 6.68GB / 7.00GB,  190MB/s  [A
+58.9s 189 Reconstructing (incomplete total...):  99%|███████▉| 6.90GB / 7.00GB,  102MB/s  [A
+58.9s 190 Reconstructing (incomplete total...):  99%|███████▉| 6.90GB / 7.00GB,  102MB/s  [A
+58.9s 191 
+58.9s 192 Fetching 64 files:  94%|██████████████████████▌ | 60/64 [00:38<00:02,  1.42it/s][A[AFetching 64 files: 100%|████████████████████████| 64/64 [00:38<00:00,  1.66it/s]
+58.9s 193 Downloading bytes: █████████████████████████████████████████| 6.71GB,  418MB/s  Download complete: : ███████████████████████████████████████| 6.71GB,  418MB/s
+58.9s 194 Reconstruction complete: 100%|█████████████████████| 7.00GB / 7.00GB,  102MB/s  [A[32m✓ Downloaded[0m
+58.9s 195 path: /tmp/val
+58.9s 196 Download complete: : ███████████████████████████████████████| 6.71GB,  418MB/s
+58.9s 197 Reconstruction complete: 100%|█████████████████████| 7.00GB / 7.00GB,  102MB/s
+59.2s 198 /kaggle/working/vitc
+75.5s 199 decoded 0/50,000  0s
+137.4s 200 decoded 10,000/50,000  62s
+200.0s 201 decoded 20,000/50,000  125s
+264.4s 202 decoded 30,000/50,000  189s
+330.0s 203 decoded 40,000/50,000  255s
+395.1s 204 generating 14 corruptions x 5000 images on 4 processes
+396.5s 205 /usr/local/lib/python3.13/dist-packages/imagecorruptions/corruptions.py:17: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+396.5s 206 from pkg_resources import resource_filename
+396.5s 207 /usr/local/lib/python3.13/dist-packages/imagecorruptions/corruptions.py:17: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+396.5s 208 from pkg_resources import resource_filename
+396.5s 209 /usr/local/lib/python3.13/dist-packages/imagecorruptions/corruptions.py:17: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+396.5s 210 from pkg_resources import resource_filename
+396.5s 211 /usr/local/lib/python3.13/dist-packages/imagecorruptions/corruptions.py:17: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+396.5s 212 from pkg_resources import resource_filename
+422.7s 213 impulse_noise: 26s
+433.7s 214 defocus_blur: 37s
+444.2s 215 gaussian_noise: 47s
+515.6s 216 motion_blur: 93s
+524.2s 217 shot_noise: 127s
+555.6s 218 snow: 111s
+560.9s 219 fog: 37s
+583.4s 220 contrast: 23s
+597.9s 221 frost: 82s
+603.1s 222 pixelate: 5s
+610.4s 223 jpeg_compression: 7s
+699.0s 224 brightness: 143s
+755.2s 225 elastic_transform: 172s
+1068.1s 226 zoom_blur: 634s
+1068.2s 227 data ready in 999s
+1068.2s 228 GPU Tesla T4, autocast torch.float16
+1072.6s 229 
+1074.3s 230 model.safetensors: reconstructing file:   0%|      |  0.00B / 88.2MB            [Amodel.safetensors: downloading bytes:                       |  0.00B            model.safetensors: downloading bytes: █▎                    | 5.37MB            model.safetensors: downloading bytes: █████                 | 20.3MB,  526kB/s  model.safetensors: downloading bytes: ███████▊              | 31.2MB, 2.75MB/s  model.safetensors: downloading bytes: █████████▋            | 38.9MB, 3.00MB/s  model.safetensors: downloading bytes: ████████████▋         | 51.0MB, 3.71MB/s  model.safetensors: downloading bytes: ███████████████▌      | 62.3MB, 4.84MB/s  model.safetensors: downloading bytes: ███████████████████   | 76.2MB, 5.88MB/s
+1074.5s 231 model.safetensors: reconstructing file: 100%|██████| 88.2MB / 88.2MB            [Amodel.safetensors: downloading bytes: ██████████████████████| 83.4MB, 7.78MB/s  model.safetensors: downloading bytes: ██████████████████████| 83.4MB, 7.78MB/s
+1074.5s 232 model.safetensors: reconstructing file: 100%|██████| 88.2MB / 88.2MB, 8.45MB/s
+1074.9s 233 /kaggle/working/vitc/src/rescore.py:138: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:213.)
+1074.9s 234 x = torch.from_numpy(np.ascontiguousarray(arr[i:i + batch])).cuda().permute(0, 3, 1, 2).float()
+1224.6s 235 deit_s_fp32    clean  79.72  corrupted  62.64  ECE  8.42 ->  3.40 (T=0.833)  156s
+1224.8s 236 
+1225.4s 237 model.safetensors: reconstructing file:   0%|      |  0.00B / 22.9MB            [Amodel.safetensors: downloading bytes:                       |  0.00B
+1225.5s 238 model.safetensors: reconstructing file:   0%|      | 9.23kB / 22.9MB            [Amodel.safetensors: downloading bytes: ██████████▊           | 11.3MB            model.safetensors: downloading bytes: ██████████████████▎   | 19.0MB, 1.12MB/s
+1225.5s 239 model.safetensors: reconstructing file: 100%|██████| 22.9MB / 22.9MB,   911B/s  [Amodel.safetensors: downloading bytes: ██████████████████████| 21.7MB, 2.12MB/s  model.safetensors: downloading bytes: ██████████████████████| 21.7MB, 2.12MB/s
+1225.5s 240 model.safetensors: reconstructing file: 100%|██████| 22.9MB / 22.9MB, 2.25MB/s
+1279.1s 241 deit_tiny_fp32 clean  72.02  corrupted  49.86  ECE 12.19 ->  2.25 (T=0.795)  55s
+1391.1s 242 A-s0           clean  76.51  corrupted  54.90  ECE  4.37 ->  4.08 (T=0.874)  112s
+1503.4s 243 A-s1           clean  76.56  corrupted  54.97  ECE  4.35 ->  4.08 (T=0.873)  112s
+1616.3s 244 A-s2           clean  76.44  corrupted  55.26  ECE  4.36 ->  4.11 (T=0.873)  113s
+1729.5s 245 B-s0           clean  72.26  corrupted  44.47  ECE  5.29 ->  4.03 (T=0.859)  113s
+1842.8s 246 B-s1           clean  72.46  corrupted  44.25  ECE  5.31 ->  4.00 (T=0.860)  113s
+1955.9s 247 B-s2           clean  72.56  corrupted  44.32  ECE  5.65 ->  3.74 (T=0.860)  113s
+2068.4s 248 C-s0           clean  75.66  corrupted  53.52  ECE  4.41 ->  4.00 (T=0.874)  112s
+2180.6s 249 C-s1           clean  75.73  corrupted  53.75  ECE  4.71 ->  4.32 (T=0.870)  112s
+2293.2s 250 C-s2           clean  75.70  corrupted  53.38  ECE  4.39 ->  4.22 (T=0.871)  113s
+2346.2s 251 D-s0           clean  71.24  corrupted  48.31  ECE 11.99 ->  3.14 (T=0.802)  53s
+2399.1s 252 D-s1           clean  71.54  corrupted  48.13  ECE 12.28 ->  2.97 (T=0.801)  53s
+2451.9s 253 D-s2           clean  71.44  corrupted  48.03  ECE 12.22 ->  2.92 (T=0.801)  53s
+2565.0s 254 A-g32-s0       clean  76.51  corrupted  54.99  ECE  4.25 ->  4.11 (T=0.874)  113s
+2677.5s 255 A-g64-s0       clean  76.14  corrupted  54.13  ECE  4.41 ->  4.26 (T=0.871)  112s
+2789.9s 256 A-g128-s0      clean  75.75  corrupted  52.94  ECE  4.50 ->  3.68 (T=0.875)  112s
+2902.1s 257 A-g256-s0      clean  75.21  corrupted  51.63  ECE  4.58 ->  4.04 (T=0.872)  112s
+3014.1s 258 A-g512-s0      clean  74.51  corrupted  50.07  ECE  4.55 ->  4.40 (T=0.870)  112s
+3014.1s 259 
+3014.1s 260 wrote /kaggle/working/rescore.json  total 2945s
+3034.7s 261 DeiT-S baseline (FP32, 88.2 MB)             fp32   1 thr  median  119.25 ms  IQR [115.74, 123.05]
+3039.1s 262 DeiT-S baseline (FP32, 88.2 MB)             fp32   4 thr  median   71.37 ms  IQR [69.91, 74.12]
+3039.1s 263 /kaggle/working/vitc/src/cpu_latency.py:64: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10.
+3039.1s 264 For migrations of users:
+3039.1s 265 1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead
+3039.1s 266 2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e)
+3039.1s 267 3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e)
+3039.1s 268 see https://github.com/pytorch/ao/issues/2259 for more details
+3039.1s 269 mm = m if kind == "fp32" else torch.ao.quantization.quantize_dynamic(m, {nn.Linear}, dtype=torch.qint8)
+3045.5s 270 DeiT-S baseline (FP32, 88.2 MB)     int8-dynamic   1 thr  median   98.95 ms  IQR [95.29, 103.12]
+3049.3s 271 DeiT-S baseline (FP32, 88.2 MB)     int8-dynamic   4 thr  median   62.84 ms  IQR [60.86, 66.78]
+3049.7s 272 A / B: decode to DeiT-S                     fp32   1 thr  median  119.25 ms  IQR [115.74, 123.05]
+3049.7s 273 A / B: decode to DeiT-S                     fp32   4 thr  median   71.37 ms  IQR [69.91, 74.12]
+3050.0s 274 A / B: decode to DeiT-S             int8-dynamic   1 thr  median   98.95 ms  IQR [95.29, 103.12]
+3050.0s 275 A / B: decode to DeiT-S             int8-dynamic   4 thr  median   62.84 ms  IQR [60.86, 66.78]
+3056.8s 276 C: pruned DeiT-S (MLP 1162)                 fp32   1 thr  median  103.68 ms  IQR [101.46, 110.78]
+3060.8s 277 C: pruned DeiT-S (MLP 1162)                 fp32   4 thr  median   64.10 ms  IQR [62.15, 66.67]
+3066.4s 278 C: pruned DeiT-S (MLP 1162)         int8-dynamic   1 thr  median   86.91 ms  IQR [84.40, 91.24]
+3069.9s 279 C: pruned DeiT-S (MLP 1162)         int8-dynamic   4 thr  median   57.86 ms  IQR [55.88, 61.07]
+3072.5s 280 D: DeiT-Tiny                                fp32   1 thr  median   40.15 ms  IQR [39.11, 42.22]
+3074.3s 281 D: DeiT-Tiny                                fp32   4 thr  median   29.95 ms  IQR [28.93, 31.09]
+3076.8s 282 D: DeiT-Tiny                        int8-dynamic   1 thr  median   38.52 ms  IQR [38.07, 40.58]
+3078.7s 283 D: DeiT-Tiny                        int8-dynamic   4 thr  median   30.28 ms  IQR [29.20, 31.51]
+3078.7s 284 
+3078.7s 285 {'machine': 'Linux-6.18.48+-x86_64-with-glibc2.39', 'processor': 'x86_64', 'torch': '2.11.0+cu128', 'timm': '1.0.29', 'qengine': 'x86', 'runs': 50, 'warmup': 10, 'batch': 1}
+3078.7s 286 Wrote /kaggle/working/cpu_latency_x86.json
+3080.0s 287 Model name:                              Intel(R) Xeon(R) CPU @ 2.00GHz
+3083.3s 288 /usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\|'
+3083.3s 289 cells[i][c] = re.sub('\\\\\|', '|', cell)
+3083.5s 290 /usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\_'
+3083.5s 291 text = re.sub(r'_', '\_', text) # Escape underscores in display text
+3084.3s 292 [NbConvertApp] Converting notebook __notebook__.ipynb to notebook
+3084.4s 293 [NbConvertApp] Writing 30745 bytes to __notebook__.ipynb
+3087.3s 294 [NbConvertApp] Converting notebook __notebook__.ipynb to html
+3088.0s 295 [NbConvertApp] Writing 299782 bytes to __results__.html

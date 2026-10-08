@@ -1,0 +1,143 @@
+============================================================================================
+1. DO ROUTES DISAGREE MORE THAN SEEDS?   (control for underspecification)
+============================================================================================
+Disagreement = fraction of images where exactly one of the two models is correct.
+Within-route pairs use different seeds; cross-route pairs are restricted to DIFFERENT seeds
+too, so both sides differ in seed and only the cross side also differs in route.
+
+--- clean  (n=50,000)
+  route    seed-vs-seed disagreement    seed Jaccard
+  A                     8.49%  [8.42-8.55]       0.694
+  B                     9.55%  [9.51-9.61]       0.705
+  C                     7.72%  [7.69-7.76]       0.726
+  D                     6.31%  [6.20-6.46]       0.801
+
+  pair   cross-route  seed floor   excess      95% CI of excess   ratio  cross J
+  A-B         12.31%       9.02%   +3.29        [+3.14, +3.44]    1.4x    0.612
+  A-C          9.92%       8.11%   +1.82        [+1.70, +1.94]    1.2x    0.656
+  A-D         14.27%       7.40%   +6.87        [+6.67, +7.08]    1.9x    0.570
+  B-C         12.38%       8.63%   +3.74        [+3.59, +3.89]    1.4x    0.615
+  B-D         14.13%       7.93%   +6.20        [+6.01, +6.40]    1.8x    0.598
+  C-D         14.01%       7.02%   +6.99        [+6.79, +7.19]    2.0x    0.581
+
+--- corrupt (n=5,000 x 14)
+  route    seed-vs-seed disagreement    seed Jaccard
+  A                    12.56%  [12.53-12.60]       0.755
+  B                    13.07%  [12.82-13.27]       0.790
+  C                    11.76%  [11.69-11.81]       0.775
+  D                     9.10%  [9.05-9.14]       0.839
+
+  pair   cross-route  seed floor   excess      95% CI of excess   ratio  cross J
+  A-B         20.59%      12.82%   +7.78        [+7.52, +8.03]    1.6x    0.661
+  A-C         15.11%      12.16%   +2.95        [+2.80, +3.10]    1.2x    0.717
+  A-D         19.89%      10.83%   +9.05        [+8.78, +9.33]    1.8x    0.660
+  B-C         20.36%      12.42%   +7.95        [+7.71, +8.19]    1.6x    0.668
+  B-D         21.12%      11.09%  +10.03       [+9.76, +10.32]    1.9x    0.672
+  C-D         19.69%      10.43%   +9.25        [+8.99, +9.53]    1.9x    0.667
+
+============================================================================================
+2. IS THE B-vs-D INVERSION BROAD, OR DRIVEN BY A FEW CORRUPTIONS?
+============================================================================================
+McNemar exact per corruption per seed; Bonferroni over 14 corruptions: p < 0.0036
+
+  corruption          family          A       B       C       D     D-B  signs  sig/3
+  gaussian_noise      noise       55.84   37.68   53.35   47.22   +9.54    3/3    3/3
+  shot_noise          noise       54.49   34.35   52.17   45.84  +11.49    3/3    3/3
+  impulse_noise       noise       55.73   37.27   53.13   46.62   +9.35    3/3    3/3
+  defocus_blur        blur        46.13   37.21   43.25   39.17   +1.96    3/3    2/3
+  motion_blur         blur        50.57   42.43   49.31   44.47   +2.03    3/3    2/3
+  zoom_blur           blur        39.79   32.81   39.58   35.03   +2.23    3/3    2/3
+  snow                weather     49.35   37.79   48.15   44.57   +6.78    3/3    3/3
+  frost               weather     47.91   36.95   47.07   41.39   +4.44    3/3    3/3
+  fog                 weather     62.67   45.90   60.99   56.94  +11.04    3/3    3/3
+  brightness          weather     73.25   67.25   72.93   67.75   +0.50    3/3    0/3
+  contrast            digital     71.19   54.64   69.92   66.37  +11.73    3/3    3/3
+  elastic_transform   digital     39.92   37.78   39.40   31.07   -6.71    0/3    0/3
+  pixelate            digital     60.47   59.15   58.56   48.77  -10.38    0/3    0/3
+  jpeg_compression    digital     62.55   58.21   61.00   56.96   -1.25    0/3    0/3
+
+  D ahead of B in all 3 seeds: 11/14 corruptions (significant in all 3 seeds: 7/14). B ahead in all 3 seeds: 3/14.
+
+  By family (mean over corruptions and seeds):
+    noise    (n=3)  A 55.36  B 36.43  C 52.89  D 46.56   D-B +10.13
+    blur     (n=3)  A 45.50  B 37.48  C 44.05  D 39.56   D-B +2.07
+    weather  (n=4)  A 58.29  B 46.97  C 57.28  D 52.66   D-B +5.69
+    digital  (n=4)  A 58.53  B 52.45  C 57.22  D 50.79   D-B -1.65
+
+============================================================================================
+3. WITHIN DeiT-S ONLY (A, B, C): DOES B'S DEFICIT GROW UNDER CORRUPTION?
+============================================================================================
+Same 5,000 images for clean and corrupted, so the difference-in-differences is paired:
+  DiD = (x - y)_corrupted - (x - y)_clean, per image, bootstrapped over images.
+Amplification = corrupted gap / clean gap. Bonferroni over 3 pairs x 3 seeds = 9 tests.
+
+  A vs B  (within DeiT-S)
+    seed 0: clean gap  +3.80  corrupted gap +10.35  DiD  +6.55  CI [+5.18, +7.90] excludes 0  amp 2.72x
+    seed 1: clean gap  +3.46  corrupted gap +10.83  DiD  +7.37  CI [+6.02, +8.69] excludes 0  amp 3.13x
+    seed 2: clean gap  +3.92  corrupted gap +11.05  DiD  +7.13  CI [+5.76, +8.46] excludes 0  amp 2.82x
+  C vs B  (within DeiT-S)
+    seed 0: clean gap  +2.92  corrupted gap  +9.04  DiD  +6.12  CI [+4.71, +7.44] excludes 0  amp 3.09x
+    seed 1: clean gap  +2.96  corrupted gap  +9.51  DiD  +6.55  CI [+5.23, +7.90] excludes 0  amp 3.21x
+    seed 2: clean gap  +3.08  corrupted gap  +9.18  DiD  +6.10  CI [+4.76, +7.45] excludes 0  amp 2.98x
+  A vs C  (within DeiT-S)
+    seed 0: clean gap  +0.88  corrupted gap  +1.31  DiD  +0.43  CI [-0.73, +1.63] includes 0  amp 1.49x
+    seed 1: clean gap  +0.50  corrupted gap  +1.32  DiD  +0.82  CI [-0.38, +1.95] includes 0  amp 2.65x
+    seed 2: clean gap  +0.84  corrupted gap  +1.87  DiD  +1.03  CI [-0.14, +2.22] includes 0  amp 2.23x
+  A vs D  (crosses architecture)
+    seed 0: clean gap  +5.06  corrupted gap  +6.61  DiD  +1.55  CI [+0.16, +2.94] excludes 0  amp 1.31x
+    seed 1: clean gap  +4.80  corrupted gap  +6.90  DiD  +2.10  CI [+0.71, +3.42] excludes 0  amp 1.44x
+    seed 2: clean gap  +5.26  corrupted gap  +7.42  DiD  +2.16  CI [+0.80, +3.53] excludes 0  amp 1.41x
+  C vs D  (crosses architecture)
+    seed 0: clean gap  +4.18  corrupted gap  +5.30  DiD  +1.12  CI [-0.22, +2.50] includes 0  amp 1.27x
+    seed 1: clean gap  +4.30  corrupted gap  +5.58  DiD  +1.28  CI [-0.14, +2.69] includes 0  amp 1.30x
+    seed 2: clean gap  +4.42  corrupted gap  +5.54  DiD  +1.12  CI [-0.27, +2.54] includes 0  amp 1.25x
+  D vs B  (crosses architecture)
+    seed 0: clean gap  -1.26  corrupted gap  +3.74  DiD  +5.00  CI [+3.60, +6.40] excludes 0  amp -2.97x
+    seed 1: clean gap  -1.34  corrupted gap  +3.93  DiD  +5.27  CI [+3.81, +6.64] excludes 0  amp -2.93x
+    seed 2: clean gap  -1.34  corrupted gap  +3.64  DiD  +4.98  CI [+3.62, +6.38] excludes 0  amp -2.71x
+
+  Off-the-line check, probit scale (Miller et al. fit lines in probit space).
+  Line through A and C (same architecture, same quantizer family), predict B, report residual.
+  Joint image bootstrap; 2 reference points only -> expect a wide interval.
+    seed 0: B residual -4.84 pts  95% CI [-7.90, +15.22]   probit slope 1.16 [0.50, 6.52]
+    seed 1: B residual -1.92 pts  95% CI [-51.57, +36.36]   probit slope 2.08 [-14.83, 14.60]
+    seed 2: B residual -2.56 pts  95% CI [-7.21, +33.20]   probit slope 1.73 [0.74, 11.31]
+
+============================================================================================
+4. IS THE CALIBRATION GAP A UNIFORM OFFSET?  (ECE vs accuracy - mean confidence)
+============================================================================================
+If ECE == acc - conf, every confidence bin is underconfident (same sign), i.e. a global
+shift that one temperature parameter largely removes (Guo et al. 2017).
+
+  route   ECE clean50k  acc-conf   |diff|  ECE corr (mean14)  acc-conf   max |diff| over 15 conds
+  A              4.353    +4.353   0.0000              4.112    -0.715                     3.6262
+  B              5.408    +5.408   0.0000              4.118    -2.205                     2.3241
+  C              4.481    +4.462   0.0186              4.075    -1.048                     3.4206
+  D             12.148   +12.148   0.0000              8.828    +7.738                     1.4232
+  (acc-conf > 0 means UNDERconfident. Training recipe: label_smoothing=0.1 on all routes;
+   route D adds KL to the teacher at temperature 2 -- see src/train_routes.py:262-267.)
+
+============================================================================================
+5. WITHIN DeiT-S: DOES ANY CORRUPTION REVERSE THE CLEAN ORDER?  (the Miller-proof test)
+============================================================================================
+A, B, C share architecture, pretrained weights, byte budget and step budget. On a per-
+corruption accuracy-on-the-line, the lower-clean model must stay lower on EVERY corruption.
+3 pairs x 14 corruptions = 42 tests. McNemar exact, Bonferroni p < 0.00119, per seed.
+
+  A over B: clean says A ahead. Per-corruption gap ranges +1.32 (pixelate) to +20.14 (shot_noise)
+      reversed in 3/3 seeds: none   | significant reversal 3/3: none
+  C over B: clean says C ahead. Per-corruption gap ranges -0.59 (pixelate) to +17.82 (shot_noise)
+      reversed in 3/3 seeds: none   | significant reversal 3/3: none
+  A over C: clean says A ahead. Per-corruption gap ranges +0.21 (zoom_blur) to +2.89 (defocus_blur)
+      reversed in 3/3 seeds: none   | significant reversal 3/3: none
+
+  Family contrast of the ternary deficit (families pre-specified; contrast chosen post hoc):
+  per image: mean_noise(x - B) - mean_digital(x - B), bootstrapped over the 5,000 images.
+    A-B seed 0: noise gap +17.66  digital gap  +5.97  difference +11.69  CI(Bonf 6) [+10.14, +13.22]
+    A-B seed 1: noise gap +18.93  digital gap  +5.93  difference +13.00  CI(Bonf 6) [+11.46, +14.61]
+    A-B seed 2: noise gap +20.17  digital gap  +6.35  difference +13.82  CI(Bonf 6) [+12.26, +15.40]
+    C-B seed 0: noise gap +16.37  digital gap  +4.86  difference +11.51  CI(Bonf 6) [+10.00, +13.11]
+    C-B seed 1: noise gap +16.74  digital gap  +4.78  difference +11.96  CI(Bonf 6) [+10.27, +13.49]
+    C-B seed 2: noise gap +16.25  digital gap  +4.69  difference +11.57  CI(Bonf 6) [+9.97, +13.16]
+
+Saved evidence/analysis/offline_analysis.json

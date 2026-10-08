@@ -1,0 +1,29 @@
+3 seeds: [0, 1, 2]   |   14 corruptions
+
+PER-ROUTE, mean +/- std across seeds
+route               clean         corrupted     drop
+A            76.61 +/- 0.40      54.99 +/- 0.26    21.62
+B            72.88 +/- 0.16      44.24 +/- 0.13    28.64
+C            75.87 +/- 0.21      53.49 +/- 0.14    22.38
+D            71.57 +/- 0.18      48.01 +/- 0.15    23.55
+
+EFFECT SIZE vs SEED NOISE  (gap / pooled std; >2 means the gap dominates noise)
+pair       clean gap   ratio   signs    corrupt gap   ratio   signs
+AvB           +3.73    12.3     3/3        +10.75    52.1     3/3
+AvC           +0.74     2.3     3/3         +1.50     7.2     3/3
+AvD           +5.04    16.4     3/3         +6.98    32.8     3/3
+BvC           -2.99    16.0     0/3         -9.24    67.7     0/3
+BvD           +1.31     7.8     3/3         -3.77    26.3     0/3
+CvD           +4.30    22.0     3/3         +5.47    37.4     3/3
+
+RANK INVERSION -- does it hold in EVERY seed?
+  seed 0: clean A > C > B > D   |   corrupted A > C > D > B
+  seed 1: clean A > C > B > D   |   corrupted A > C > D > B
+  seed 2: clean A > C > B > D   |   corrupted A > C > D > B
+
+  B vs D: inverts in 3/3 seeds | clean gap +1.31 (7.8x noise) | corrupted gap -3.77 (26.3x noise)
+    -> ROBUST
+
+CAVEAT: 3 seeds is too few for a significance test ON seed variance.
+Report mean +/- std and sign consistency. Do NOT quote a p-value over seeds.
+If any ratio above is under 3, run more seeds before claiming robustness.

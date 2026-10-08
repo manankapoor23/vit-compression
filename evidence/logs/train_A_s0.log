@@ -1,0 +1,74 @@
+ChotaDeiT-A seed=0: 50 layers fake-quantized | knob=36 | 3000 steps
+  data: 200 train shards, 64 val shards
+/usr/local/lib/python3.10/dist-packages/webdataset/compat.py:381: UserWarning: set WebDataset(shardshuffle=...) to a positive integer or 0 or False
+  warnings.warn("set WebDataset(shardshuffle=...) to a positive integer or 0 or False")
+  step 50/3000  loss 1.872  2.3 it/s
+  step 100/3000  loss 1.725  2.4 it/s
+  step 150/3000  loss 1.816  2.4 it/s
+  step 200/3000  loss 1.946  2.4 it/s
+  step 250/3000  loss 1.566  2.4 it/s
+  step 300/3000  loss 1.885  2.4 it/s
+  step 350/3000  loss 1.728  2.4 it/s
+  step 400/3000  loss 1.999  2.4 it/s
+  step 450/3000  loss 1.976  2.4 it/s
+  step 500/3000  loss 1.766  2.4 it/s
+  >> step 500: top-1 (40 batches) = 75.93%
+  step 550/3000  loss 1.716  1.9 it/s
+  step 600/3000  loss 1.708  1.9 it/s
+  step 650/3000  loss 1.824  1.9 it/s
+  step 700/3000  loss 1.738  2.0 it/s
+  step 750/3000  loss 1.759  2.0 it/s
+  step 800/3000  loss 1.826  2.0 it/s
+  step 850/3000  loss 1.715  2.0 it/s
+  step 900/3000  loss 1.969  2.1 it/s
+  step 950/3000  loss 1.743  2.1 it/s
+  step 1000/3000  loss 1.773  2.1 it/s
+  >> step 1000: top-1 (40 batches) = 75.35%
+  step 1050/3000  loss 1.684  1.8 it/s
+  step 1100/3000  loss 1.680  1.8 it/s
+  step 1150/3000  loss 1.611  1.8 it/s
+  step 1200/3000  loss 1.766  1.8 it/s
+  step 1250/3000  loss 1.611  1.9 it/s
+  step 1300/3000  loss 1.679  1.9 it/s
+  step 1350/3000  loss 1.597  1.9 it/s
+  step 1400/3000  loss 1.721  1.9 it/s
+  step 1450/3000  loss 1.752  1.9 it/s
+  step 1500/3000  loss 1.775  1.9 it/s
+  >> step 1500: top-1 (40 batches) = 75.53%
+  step 1550/3000  loss 1.516  1.8 it/s
+  step 1600/3000  loss 1.667  1.8 it/s
+  step 1650/3000  loss 1.759  1.8 it/s
+  step 1700/3000  loss 1.713  1.8 it/s
+  step 1750/3000  loss 1.778  1.9 it/s
+  step 1800/3000  loss 1.578  1.9 it/s
+  step 1850/3000  loss 1.604  1.9 it/s
+  step 1900/3000  loss 1.638  1.9 it/s
+  step 1950/3000  loss 1.620  1.9 it/s
+  step 2000/3000  loss 1.699  1.9 it/s
+  >> step 2000: top-1 (40 batches) = 76.25%
+  step 2050/3000  loss 1.452  1.8 it/s
+  step 2100/3000  loss 1.424  1.8 it/s
+  step 2150/3000  loss 1.664  1.8 it/s
+  step 2200/3000  loss 1.614  1.8 it/s
+  step 2250/3000  loss 1.546  1.8 it/s
+  step 2300/3000  loss 1.470  1.9 it/s
+  step 2350/3000  loss 1.583  1.9 it/s
+  step 2400/3000  loss 1.607  1.9 it/s
+  step 2450/3000  loss 1.601  1.9 it/s
+  step 2500/3000  loss 1.607  1.9 it/s
+  >> step 2500: top-1 (40 batches) = 76.45%
+  step 2550/3000  loss 1.557  1.8 it/s
+  step 2600/3000  loss 1.514  1.8 it/s
+  step 2650/3000  loss 1.475  1.8 it/s
+  step 2700/3000  loss 1.617  1.8 it/s
+  step 2750/3000  loss 1.535  1.9 it/s
+  step 2800/3000  loss 1.602  1.9 it/s
+  step 2850/3000  loss 1.636  1.9 it/s
+  step 2900/3000  loss 1.497  1.9 it/s
+  step 2950/3000  loss 1.527  1.9 it/s
+  step 3000/3000  loss 1.706  1.9 it/s
+  >> step 3000: top-1 (40 batches) = 76.68%
+  (final eval over 100 batches = 25,600 images)
+
+FINAL top-1: 76.66%
+Exported models/ChotaDeiT-A-s0.bin: 9.718 MB (target 9.718)

@@ -1,0 +1,34 @@
+{
+  "route": "B",
+  "seed": 0,
+  "steps": 3000,
+  "knob": 15,
+  "final_top1": 72.3671875,
+  "history": [
+    {
+      "step": 500,
+      "top1_subset": 67.587890625
+    },
+    {
+      "step": 1000,
+      "top1_subset": 69.4140625
+    },
+    {
+      "step": 1500,
+      "top1_subset": 70.390625
+    },
+    {
+      "step": 2000,
+      "top1_subset": 71.865234375
+    },
+    {
+      "step": 2500,
+      "top1_subset": 72.40234375
+    },
+    {
+      "step": 3000,
+      "top1_subset": 72.734375
+    }
+  ],
+  "mb": 9.784567
+}

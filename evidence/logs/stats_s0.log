@@ -1,0 +1,27 @@
+4 models | 5000 images | 14 corruptions
+Bonferroni: 12 tests, so significance requires p < 0.0042
+
+CLEAN ACCURACY -- McNemar exact test (paired)
+pair        acc1    acc2      b      c           p  verdict
+AvB       76.74%  72.94%    379    189    1.19e-15  DIFFERENT
+AvC       76.74%  75.86%    265    221    5.10e-02  not distinguishable
+AvD       76.74%  71.68%    482    229    1.26e-21  DIFFERENT
+BvC       72.94%  75.86%    230    376    3.26e-09  DIFFERENT
+BvD       72.94%  71.68%    378    315    1.84e-02  not distinguishable
+CvD       75.86%  71.68%    457    248    2.99e-15  DIFFERENT
+
+CORRUPTION ROBUSTNESS -- bootstrap over images (10,000 resamples)
+per-image accuracy averaged across corruptions, so images are the unit
+pair       mean1   mean2    diff            95% CI  verdict
+AvB       54.74%  44.39% +10.35%    [+9.67,+11.05]  DIFFERENT
+AvC       54.74%  53.43%  +1.31%     [+0.76,+1.86]  DIFFERENT
+AvD       54.74%  48.13%  +6.61%     [+5.88,+7.32]  DIFFERENT
+BvC       44.39%  53.43%  -9.04%     [-9.72,-8.34]  DIFFERENT
+BvD       44.39%  48.13%  -3.74%     [-4.48,-3.02]  DIFFERENT
+CvD       53.43%  48.13%  +5.30%     [+4.56,+6.03]  DIFFERENT
+
+RANK INVERSION CHECK
+  by clean     : A > C > B > D
+  by corrupted : A > C > D > B
+  B vs D: clean p=1.84e-02 | corrupted CI [-4.48,-3.02]
+    -> NOT both significant: state it as a trend, not a result

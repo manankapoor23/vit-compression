@@ -1,0 +1,20 @@
+MEASURED file size vs the nominal formula params x bits / 8   (standard policy:
+patch_embed + head + norms + biases FP16; symmetric group-wise, FP16 scales)
+
+model                               params  width FP16 share  INT8 g256  INT4 g256  INT3 g256  INT2 g256  INT4 g32  max hdr
+deit_tiny_patch16_224            5,717,416    192      7.2%     +8.0%     +23.2%     +33.3%     +53.5%    +33.3%   6,992B
+deit_small_patch16_224          22,050,664    384      3.7%     +4.5%     +12.7%     +18.1%     +29.1%    +23.2%   7,101B
+swin_tiny_patch4_window7_224    28,288,354     96      3.0%     +3.8%     +10.7%     +15.3%     +24.5%    +21.3%   9,765B
+deit_base_patch16_224           86,567,656    768      1.9%     +2.7%      +7.2%     +10.2%     +16.3%    +17.9%   7,263B
+vit_large_patch16_224          304,326,632   1024      0.8%     +1.5%      +3.9%      +5.4%      +8.5%    +14.7%  14,626B
+
+Every measured file = predicted-from-shapes + a JSON header (last column, worst case);
+the assert above fails the script if any file deviates by more than that.
+
+Monotonicity checks (the two axes of Contribution A):
+  deit_tiny_patch16_224          overhead rises as bits fall (8>4>3>2): True
+  deit_small_patch16_224         overhead rises as bits fall (8>4>3>2): True
+  swin_tiny_patch4_window7_224   overhead rises as bits fall (8>4>3>2): True
+  deit_base_patch16_224          overhead rises as bits fall (8>4>3>2): True
+  vit_large_patch16_224          overhead rises as bits fall (8>4>3>2): True
+  plain-ViT family, INT2 g256 overhead shrinks as width grows (width 192 -> 384 -> 768 -> 1024: +53.5% -> +29.1% -> +16.3% -> +8.5%): True
