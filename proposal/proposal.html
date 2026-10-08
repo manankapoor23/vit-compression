@@ -220,6 +220,7 @@ ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
 <h3>Limitations stated up front</h3>
 <p>• Only the weights are compressed, not the activations (the numbers computed while the model runs), so these accuracies must not be compared with papers that do both.</p>
 <p>• Fine-tuning used about 20% of ImageNet for 3000 steps. Nothing had finished improving: ternary was still gaining faster than 3-bit, so the ranking belongs to this budget.</p>
+<p>• No single model stacks all three methods. Each route combines at most two (C: pruning and quantisation; D: distillation and quantisation), so that every comparison changes one thing at a time; a model using all three is left as an extension.</p>
 <p>• ImageNet-C is regenerated, so numbers do not match published ImageNet-C scores. Every route sees identical corruptions, so comparisons between routes are fair.</p>
 <p>• Ternary sits 4–5 points below the trend line on noise in all three seeds, but this does not pass a Bonferroni-strict test, so it is reported as consistent, not proven. Miller et al. also note that Gaussian noise is a shift where the trend line often breaks down, so the O7 test rests on a trend that may not hold for noise.</p>
 
