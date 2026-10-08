@@ -5,5 +5,4 @@ __pycache__/
 audit_out/
 gpu_bundle/
 evidence/vitc_models.tgz
-CLAUDE.md
 docs/literature/*_fulltext.txt
