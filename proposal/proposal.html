@@ -1,33 +1,28 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>Same Bytes, Different Failures — UCS532 Proposal P49</title>
 <style>
-@page { size: A4; margin: 20mm 18mm 16mm 18mm;
-  @top-left { content: "Same Bytes, Different Failures"; font: 8.5pt Helvetica, Arial, sans-serif; color: #555; border-bottom: 0.5pt solid #bbb; vertical-align: bottom; padding-bottom: 1.5mm; }
-  @top-right { content: counter(page); font: 8.5pt Helvetica, Arial, sans-serif; color: #555; border-bottom: 0.5pt solid #bbb; vertical-align: bottom; padding-bottom: 1.5mm; } }
-body { font-family: Helvetica, Arial, sans-serif; font-size: 9.6pt; line-height: 1.42; color: #111; margin: 0; text-align: justify; }
-h1 { font-size: 17pt; text-align: center; margin: 0 0 1mm; }
-.sub { text-align: center; font-size: 11pt; color: #555; margin: 0 0 4mm; }
-h2 { font-size: 13pt; margin: 5mm 0 2mm; page-break-after: avoid; }
-h3 { font-size: 10.2pt; margin: 3mm 0 1mm; page-break-after: avoid; }
-p { margin: 0 0 2mm; }
-table { page-break-inside: avoid; width: 100%; border-collapse: collapse; margin: 1.5mm 0 2.5mm; font-size: 8.8pt; line-height: 1.35; text-align: left; }
-td, th { border: 0.5pt solid #b8c2d4; padding: 1.1mm 1.8mm; vertical-align: top; }
-th { background: #1f3864; color: #fff; font-weight: bold; }
-tr:nth-child(even) td { background: #eef2f8; }
+@page { size: A4; margin: 17mm 17mm 16mm 17mm; @bottom-center { content: counter(page); font: 9pt Georgia, serif; color: #555; } }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 10.4pt; line-height: 1.48; color: #111; margin: 0; }
+h1 { font-size: 20pt; text-align: center; margin: 0 0 1mm; }
+.sub { text-align: center; font-size: 11.5pt; font-style: italic; color: #333; margin: 0 0 5mm; }
+h2 { font-size: 13.5pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+h3 { font-size: 11pt; margin: 3.5mm 0 1mm; page-break-after: avoid; }
+p { margin: 0 0 2.3mm; }
+table { page-break-inside: avoid; width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.5pt; line-height: 1.38; }
+td, th { border: 0.6pt solid #888; padding: 1.2mm 2mm; vertical-align: top; text-align: left; }
+th { background: #eee; }
 tr { page-break-inside: avoid; }
-table.meta td:first-child { font-weight: bold; width: 21%; }
-table.meta tr:first-child td { background: #1f3864; color: #fff; }
-.box { page-break-inside: avoid; background: #f5f0e3; border: 0.5pt solid #c9b98f; padding: 2mm 3.5mm; margin: 2.5mm 4mm 3mm; }
+table.meta td:first-child { font-weight: bold; width: 22%; background: #f6f6f6; }
+.box { page-break-inside: avoid; border-left: 1.2pt solid #111; padding: 0.5mm 0 0.5mm 3.5mm; margin: 2.5mm 0 3.5mm; }
 .box p:last-child { margin: 0; }
-.gate { page-break-inside: avoid; background: #f3f3f3; border: 0.5pt solid #bbb; padding: 1.8mm 3.5mm; margin: 1.5mm 4mm 3mm; font-size: 9pt; }
-.gate.pass { background: #e4efdb; border-color: #9cbf7f; }
-.gate b.t { display: block; margin-bottom: 1mm; }
-.gate div { margin-bottom: 1mm; }
+.gate { page-break-inside: avoid; border: 0.6pt solid #888; padding: 1.5mm 3mm; margin: 1.5mm 0 3mm; }
+.gate b.t { display: block; margin-bottom: 0.8mm; }
+.gate div { margin-bottom: 0.8mm; }
 .eq { text-align: center; margin: 1.5mm 0 2mm; }
-.note { font-size: 8.6pt; color: #333; margin-top: -1.5mm; }
-ul { margin: 0 0 2mm; padding-left: 4mm; } li { margin-bottom: 0.7mm; }
-.refs { padding-left: 0; list-style: none; } .refs li { font-size: 8.8pt; margin-bottom: 1mm; }
-.small li { font-size: 8.8pt; }
+.note { font-size: 9pt; color: #333; margin-top: -1.5mm; }
+ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
+.refs { padding-left: 0; list-style: none; } .refs li { font-size: 9.4pt; margin-bottom: 1mm; }
+.small li { font-size: 9.4pt; }
 </style></head><body>
 
 <h1>Same Bytes, Different Failures</h1>
