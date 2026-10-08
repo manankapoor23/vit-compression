@@ -1,0 +1,22 @@
+Table 1. Four routes at ~9.8 MB vs the uncompressed model (clean: 50,000 images; damaged: mean of 14 corruptions, severity 3, 5,000 images)
+model                      file MB  clean %   3-seed range   loss  damaged %  x86 ms  M2 ms
+DeiT-S, uncompressed         88.24    79.72                            62.64    71.4   17.8
+A  3-bit                     9.718    76.50 [76.44, 76.56]   3.22      55.04    71.4   17.8
+B  ternary                   9.785    72.43 [72.26, 72.56]   7.29      44.35    71.4   17.8
+C  4-bit + pruning           9.796    75.70 [75.66, 75.73]   4.02      53.55    64.1   16.1
+D  distilled DeiT-Tiny       9.765    71.41 [71.24, 71.54]   8.31      48.16    29.9    8.0
+
+Table 2. What each stage buys and costs (seed 0 where a route has seeds)
+stage                                                file MB  clean %  damaged %
+DeiT-S, 32-bit                                         88.24    79.72      62.64
+route A: shrink every weight to 3 bits (group size = weights sharing one scale)
+  3-bit, group 512                                     8.586    74.51      50.07
+  3-bit, group 256                                     8.672    75.21      51.63
+  3-bit, group 128                                     8.843    75.75      52.94
+  3-bit, group 64                                      9.186    76.14      54.13
+  3-bit, group 36  (route A as submitted)              9.718    76.51      54.90
+  3-bit, group 32  (above the matched ~9.77 MB)        9.870    76.51      54.99
+route D: swap to a smaller network, then shrink it
+  DeiT-Tiny, 32-bit (timm weights)                     22.90    72.02      49.86
+  + distilled from DeiT-S, 8-bit (38 layers 16-bit)    9.765    71.24      48.31
+routes B and C: only the final model was saved; their intermediate stages were not measured.
