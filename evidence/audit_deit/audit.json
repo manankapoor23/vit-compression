@@ -1,0 +1,127 @@
+{
+  "model": "deit_small_patch16_224",
+  "total_params": 22050664,
+  "budget_mb": 10.0,
+  "sections": {
+    "params": {
+      "blocks.mlp": 14178816,
+      "blocks.attn": 7096320,
+      "head": 385000,
+      "patch_embed": 295296,
+      "pos_embed+cls": 76032,
+      "blocks.norm": 18432,
+      "final_norm": 768
+    },
+    "sizes": [
+      {
+        "format": "FP32",
+        "group": "-",
+        "bytes": 88237806,
+        "bits_per_param": 32.01275245044775
+      },
+      {
+        "format": "FP16",
+        "group": "-",
+        "bytes": 44136494,
+        "bits_per_param": 16.01275825526161
+      },
+      {
+        "format": "INT8",
+        "group": "g=32",
+        "bytes": 24201869,
+        "bits_per_param": 8.780459037423999
+      },
+      {
+        "format": "INT8",
+        "group": "g=64",
+        "bytes": 23538317,
+        "bits_per_param": 8.539721797039762
+      },
+      {
+        "format": "INT8",
+        "group": "g=128",
+        "bytes": 23206505,
+        "bits_per_param": 8.41934011601646
+      },
+      {
+        "format": "INT8",
+        "group": "g=256",
+        "bytes": 23040617,
+        "bits_per_param": 8.359155805920402
+      },
+      {
+        "format": "INT4",
+        "group": "g=32",
+        "bytes": 13585025,
+        "bits_per_param": 4.928658837665841
+      },
+      {
+        "format": "INT4",
+        "group": "g=64",
+        "bytes": 12921473,
+        "bits_per_param": 4.687921597281606
+      },
+      {
+        "format": "INT4",
+        "group": "g=128",
+        "bytes": 12589661,
+        "bits_per_param": 4.567539916258304
+      },
+      {
+        "format": "INT4",
+        "group": "g=256",
+        "bytes": 12423773,
+        "bits_per_param": 4.507355606162245
+      },
+      {
+        "format": "INT3",
+        "group": "g=32",
+        "bytes": 10930817,
+        "bits_per_param": 3.9657098761289
+      },
+      {
+        "format": "INT3",
+        "group": "g=64",
+        "bytes": 10267265,
+        "bits_per_param": 3.724972635744665
+      },
+      {
+        "format": "INT3",
+        "group": "g=128",
+        "bytes": 9935453,
+        "bits_per_param": 3.6045909547213637
+      },
+      {
+        "format": "INT3",
+        "group": "g=256",
+        "bytes": 9769565,
+        "bits_per_param": 3.5444066446253046
+      },
+      {
+        "format": "INT2",
+        "group": "g=32",
+        "bytes": 8276609,
+        "bits_per_param": 3.00276091459196
+      },
+      {
+        "format": "INT2",
+        "group": "g=64",
+        "bytes": 7613057,
+        "bits_per_param": 2.7620236742077244
+      },
+      {
+        "format": "INT2",
+        "group": "g=128",
+        "bytes": 7281245,
+        "bits_per_param": 2.641641993184423
+      },
+      {
+        "format": "INT2",
+        "group": "g=256",
+        "bytes": 7115357,
+        "bits_per_param": 2.581457683088364
+      }
+    ],
+    "leftovers_group": 128
+  }
+}

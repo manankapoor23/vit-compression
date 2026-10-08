@@ -1,0 +1,5 @@
+  data: 200 train shards, 64 val shards
+/usr/local/lib/python3.10/dist-packages/webdataset/compat.py:381: UserWarning: set WebDataset(shardshuffle=...) to a positive integer or 0 or False
+  warnings.warn("set WebDataset(shardshuffle=...) to a positive integer or 0 or False")
+ChotaDeiT-B  top-1 = 73.25%  (25,600 images)
+Exported: 9.665 MB

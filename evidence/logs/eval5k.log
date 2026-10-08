@@ -1,0 +1,21 @@
+  clean: eval_cache/clean_5000.npy
+  all corrupted sets already cached
+
+15 conditions x 5000 images x 4 models
+
+/workspace/vit-compression/src/evaluate_routes.py:186: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:206.)
+  x = torch.from_numpy(np.ascontiguousarray(arr[i:i + batch]))
+ChotaDeiT-A: clean 77.06% | corrupted mean 55.94% | drop 21.12 pts | ECE 5.51
+ChotaDeiT-B: clean 73.42% | corrupted mean 44.89% | drop 28.53 pts | ECE 6.21
+ChotaDeiT-C: clean 75.76% | corrupted mean 52.89% | drop 22.87 pts | ECE 4.47
+ChotaDeiT-D: clean 71.52% | corrupted mean 48.01% | drop 23.51 pts | ECE 11.76
+
+PER-EXAMPLE FAILURE AGREEMENT (clean):
+  A vs B: disagree on 10.8% of images | failure overlap (Jaccard) 0.641
+  A vs C: disagree on 10.0% of images | failure overlap (Jaccard) 0.651
+  A vs D: disagree on 13.6% of images | failure overlap (Jaccard) 0.582
+  B vs C: disagree on 11.5% of images | failure overlap (Jaccard) 0.631
+  B vs D: disagree on 13.3% of images | failure overlap (Jaccard) 0.610
+  C vs D: disagree on 14.1% of images | failure overlap (Jaccard) 0.577
+
+Wrote logs/eval.json

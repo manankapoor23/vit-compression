@@ -1,0 +1,89 @@
+Loading deit_base_patch16_224 ...
+
+==============================================================================
+1. WHERE THE PARAMETERS ARE  —  deit_base_patch16_224
+==============================================================================
+component               params    share      FP32   distribution
+blocks.mlp          56,669,184   65.5%   226.68MB   #####################
+blocks.attn         28,348,416   32.7%   113.39MB   ##########
+head                   769,000    0.9%     3.08MB   #
+patch_embed            590,592    0.7%     2.36MB   #
+pos_embed+cls          152,064    0.2%     0.61MB   #
+blocks.norm             36,864    0.0%     0.15MB   #
+final_norm               1,536    0.0%     0.01MB   #
+TOTAL               86,567,656  100.0%   346.27MB
+
+  >> BUDGET: 10 MB / 86,567,656 params = 0.92 bits per parameter
+
+==============================================================================
+2. WHAT IT ACTUALLY WEIGHS ON DISK  (measured, not params x bits / 8)
+==============================================================================
+format    group    nominal    ACTUAL  bits/param  overhead   fits 10MB?
+  (nominal = params x bits / 8 -- the number the literature prints)
+FP32          -    346.27M   346.31M       32.00     0.0%   no
+FP16          -    173.14M   173.17M       16.00     0.0%   no
+INT8       g=32     86.57M    93.52M        8.64     8.0%   no
+INT8       g=64     86.57M    90.86M        8.40     5.0%   no
+INT8      g=128     86.57M    89.53M        8.27     3.4%   no
+INT8      g=256     86.57M    88.87M        8.21     2.7%   no
+INT4       g=32     43.28M    51.05M        4.72    17.9%   no
+INT4       g=64     43.28M    48.39M        4.47    11.8%   no
+INT4      g=128     43.28M    47.07M        4.35     8.7%   no
+INT4      g=256     43.28M    46.40M        4.29     7.2%   no
+INT3       g=32     32.46M    40.43M        3.74    24.5%   no
+INT3       g=64     32.46M    37.78M        3.49    16.4%   no
+INT3      g=128     32.46M    36.45M        3.37    12.3%   no
+INT3      g=256     32.46M    35.79M        3.31    10.2%   no
+INT2       g=32     21.64M    29.82M        2.76    37.8%   no
+INT2       g=64     21.64M    27.16M        2.51    25.5%   no
+INT2      g=128     21.64M    25.83M        2.39    19.4%   no
+INT2      g=256     21.64M    25.17M        2.33    16.3%   no
+
+==============================================================================
+3. THE LEFTOVERS  —  what standard tooling refuses to quantize
+==============================================================================
+
+  INT8 (group 128):
+    standard (patch_embed + head left FP16) :  89.53 MB
+      of which un-quantized FP16 leftovers  :   3.27 MB (3.6% of the file)
+    fully quantized                         :  88.20 MB (+1.5%)
+    scale metadata cost                     :   1.33 MB (0.123 bits/param)
+
+  INT4 (group 128):
+    standard (patch_embed + head left FP16) :  47.07 MB
+      of which un-quantized FP16 leftovers  :   3.27 MB (6.9% of the file)
+    fully quantized                         :  45.05 MB (+4.3%)
+    scale metadata cost                     :   1.33 MB (0.123 bits/param)
+
+  INT3 (group 128):
+    standard (patch_embed + head left FP16) :  36.45 MB
+      of which un-quantized FP16 leftovers  :   3.27 MB (9.0% of the file)
+    fully quantized                         :  34.27 MB (+6.0%)
+    scale metadata cost                     :   1.33 MB (0.123 bits/param)
+
+  INT2 (group 128):
+    standard (patch_embed + head left FP16) :  25.83 MB
+      of which un-quantized FP16 leftovers  :   3.27 MB (12.6% of the file)
+    fully quantized                         :  23.48 MB (+9.1%)
+    scale metadata cost                     :   1.33 MB (0.123 bits/param)
+
+==============================================================================
+4. TERNARY PACKING PROJECTION  (the methods-line win)
+==============================================================================
+  naive 2-bit packing (FTerViT ships ~2.11)    2.000 bits  -> 21.64 MB
+  base-3 packing, 5 weights / byte             1.600 bits  -> 17.31 MB
+  Shannon floor, log2(3), uniform              1.585 bits  -> 17.15 MB
+  entropy @ 37.3% zeros (FTerViT reported)     1.580 bits  -> 17.10 MB
+
+  TWO DISTINCT GAPS — keep them separate:
+    packing  2.110 -> 1.600 = 0.510 bits/param  <- LARGE. your methods line.
+    entropy  1.600 -> 1.580 = 0.020 bits/param  <- negligible. the dead end.
+  base-3 packing achieves 1.600 (=8/5), NOT the 1.585 log2(3) floor.
+  Caveat: 2.110 includes FTerViT's scale overhead; packing touches only the
+  code bits, so the realistic win is ~19-24%. Decompose before quoting it.
+
+Wrote /private/tmp/claude-501/-Users-manankapoor-Developer-VLM-Compression/657d37c5-da38-4f9d-88da-f354ff02443d/scratchpad/audit/deit_base_patch16_224.json
+Serialized models in /private/tmp/claude-501/-Users-manankapoor-Developer-VLM-Compression/657d37c5-da38-4f9d-88da-f354ff02443d/scratchpad/audit/out_deit_base_patch16_224/  —  verify with: ls -l /private/tmp/claude-501/-Users-manankapoor-Developer-VLM-Compression/657d37c5-da38-4f9d-88da-f354ff02443d/scratchpad/audit/out_deit_base_patch16_224
+real 34.55
+user 34.96
+sys 4.57

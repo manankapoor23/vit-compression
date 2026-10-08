@@ -1,0 +1,28 @@
+  clean: eval_cache/clean_64.npy
+generating 14 corrupted sets on 16 processes (one-time; cached afterwards)
+  pixelate s3: 0s
+  jpeg_compression s3: 0s
+  contrast s3: 0s
+  fog s3: 0s
+  impulse_noise s3: 0s
+  gaussian_noise s3: 0s
+  defocus_blur s3: 0s
+  snow s3: 1s
+  motion_blur s3: 1s
+  frost s3: 1s
+  shot_noise s3: 1s
+  brightness s3: 1s
+  elastic_transform s3: 1s
+  zoom_blur s3: 4s
+
+15 conditions x 64 images x 2 models
+
+/workspace/vit-compression/src/evaluate_routes.py:155: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /opt/pytorch/pytorch/torch/csrc/utils/tensor_numpy.cpp:206.)
+  x = torch.from_numpy(np.ascontiguousarray(arr[i:i + batch]))
+ChotaDeiT-A: clean 75.00% | corrupted mean 53.91% | drop 21.09 pts | ECE 12.78
+ChotaDeiT-B: clean 71.88% | corrupted mean 39.29% | drop 32.59 pts | ECE 11.16
+
+PER-EXAMPLE FAILURE AGREEMENT (clean):
+  A vs B: disagree on 9.4% of images | failure overlap (Jaccard) 0.700
+
+Wrote logs/eval.json

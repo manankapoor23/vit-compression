@@ -1,0 +1,7 @@
+# Offline reproduction (Mac/CPU). Versions used 2026-09-25: numpy 2.5.3, scipy 1.18.1.
+numpy
+scipy
+torch      # only for the size audit
+timm       # only for the size audit (model shapes; --random-init needs no download)
+# GPU-box training/evaluation additionally used: torch 2.4.0 (NGC), timm 1.0.29,
+# webdataset, imagecorruptions, scikit-image, numpy<2 (imagecorruptions breaks on numpy 2).
