@@ -2,27 +2,29 @@
 <html><head><meta charset="utf-8"><title>Same Bytes, Different Failures — UCS532 Proposal P49</title>
 <style>
 @page { size: A4; margin: 17mm 17mm 16mm 17mm; @bottom-center { content: counter(page); font: 9pt Georgia, serif; color: #555; } }
-body { font-family: Georgia, "Times New Roman", serif; font-size: 10.4pt; line-height: 1.48; color: #111; margin: 0; }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 10.2pt; line-height: 1.45; color: #111; margin: 0; }
 h1 { font-size: 20pt; text-align: center; margin: 0 0 1mm; }
 .sub { text-align: center; font-size: 11.5pt; font-style: italic; color: #333; margin: 0 0 5mm; }
-h2 { font-size: 13.5pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+h2 { font-size: 13.5pt; margin: 5.5mm 0 2mm; page-break-after: avoid; }
 h3 { font-size: 11pt; margin: 3.5mm 0 1mm; page-break-after: avoid; }
-p { margin: 0 0 2.3mm; }
-table { page-break-inside: avoid; width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.5pt; line-height: 1.38; }
+p { margin: 0 0 2.2mm; }
+table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.4pt; line-height: 1.36; }
 td, th { border: 0.6pt solid #888; padding: 1.2mm 2mm; vertical-align: top; text-align: left; }
 th { background: #eee; }
 tr { page-break-inside: avoid; }
 table.meta td:first-child { font-weight: bold; width: 22%; background: #f6f6f6; }
 .box { page-break-inside: avoid; border-left: 1.2pt solid #111; padding: 0.5mm 0 0.5mm 3.5mm; margin: 2.5mm 0 3.5mm; }
 .box p:last-child { margin: 0; }
-.gate { page-break-inside: avoid; border: 0.6pt solid #888; padding: 1.5mm 3mm; margin: 1.5mm 0 3mm; }
+.idea { page-break-inside: avoid; margin: 0 0 3mm; }
+.idea p { margin: 0 0 1.2mm; }
+.idea .here { font-style: italic; }
+.gate { page-break-inside: avoid; border: 0.6pt solid #888; padding: 1.5mm 3mm; margin: 1.5mm 0 2.5mm; }
 .gate b.t { display: block; margin-bottom: 0.8mm; }
-.gate div { margin-bottom: 0.8mm; }
+.gate div { margin-bottom: 0.6mm; }
 .eq { text-align: center; margin: 1.5mm 0 2mm; }
-.note { font-size: 9pt; color: #333; margin-top: -1.5mm; }
 ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
-.refs { padding-left: 0; list-style: none; } .refs li { font-size: 9.4pt; margin-bottom: 1mm; }
-.small li { font-size: 9.4pt; }
+.refs { padding-left: 0; list-style: none; } .refs li { font-size: 9.3pt; margin-bottom: 1mm; }
+.small li { font-size: 9.3pt; }
 </style></head><body>
 
 <h1>Same Bytes, Different Failures</h1>
@@ -30,227 +32,224 @@ ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
 
 <table class="meta">
 <tr><td>Problem</td><td>P49 — Compressing a Vision Transformer to 10 MB [Challenging]</td></tr>
-<tr><td>Source model</td><td>DeiT-Small: 22,050,664 weights (the numbers it learned), 88.2 MB on disk</td></tr>
-<tr><td>Datasets</td><td>ImageNet-1k validation (50,000 images, 1,000 classes); 14 ImageNet-C corruptions at severity 3 of 5 on 5,000 of those images; about 20% of the ImageNet training set for fine-tuning</td></tr>
-<tr><td>Scale</td><td>4 compression routes × 3 random seeds = 12 models; a 5-model group-size ablation; a file-size audit of 5 architectures</td></tr>
-<tr><td>Reproduction target</td><td>DeiT-Small 79.8% top-1 (published) reproduced within 0.2 points in my own pipeline</td></tr>
+<tr><td>Source model</td><td>DeiT-Small, a standard image classifier: 22,050,664 weights, 88.2 MB on disk</td></tr>
+<tr><td>Datasets</td><td>ImageNet-1k validation set (50,000 photos, 1,000 classes); 14 kinds of artificial damage (ImageNet-C) on 5,000 of those photos; about 20% of the ImageNet training set for retraining</td></tr>
+<tr><td>Scale</td><td>4 compression routes, each trained 3 times = 12 models; 5 extra models for one ablation; a file-size check across 5 networks</td></tr>
+<tr><td>Reproduction target</td><td>DeiT-Small's published 79.8% accuracy, reproduced in my own pipeline (79.72%)</td></tr>
 <tr><td>Deliverable</td><td>UCS532 sessional report, CVPR format</td></tr>
 <tr><td>Duration</td><td><b>7 weeks: Week 3 to Week 9</b>, with the mandatory checkpoint at Week 6</td></tr>
 </table>
 
 <h2>1 Motivation and Central Idea</h2>
-<p>A phone, a drone or a small camera cannot comfortably hold an 88 MB model. P49 asks for a Vision Transformer under 10 MB, which leaves about 3.6 bits per weight instead of 32. There are three standard ways to get there. <b>Quantisation</b> stores each weight with fewer bits, by rounding it to one of a few allowed values. <b>Pruning</b> deletes the parts of the network that matter least. <b>Distillation</b> trains a smaller network (the student) to copy the answers of the big one (the teacher).</p>
-<p>Each method has its own papers. Almost every one of them reports two things: top-1 accuracy on clean images, and a model size worked out with a formula.</p>
-<div class="box"><p><b>The problem with that evaluation.</b></p>
-<p>Both numbers hide something. The size is computed as weights × bits ÷ 8, but a real file also stores scales (the numbers that turn rounded codes back into weights) and keeps a few layers at higher precision. With one scale per channel, as most vision papers use, this adds only 2–5%, so the formula is a fair shortcut. Under a hard megabyte limit it is not: small groups of weights and small models are needed, and my real 2-bit DeiT-Small file is <b>29% bigger</b> than the formula says, DeiT-Tiny <b>53% bigger</b>. The accuracy hides behaviour: two models with the same score can get different images wrong, and react differently to noise or blur. A comparison of methods on these two numbers alone is not a comparison at equal size, and it says nothing about how the models fail.</p></div>
-<p>Pieces of this are known. Hooker et al. (2019) showed that a compressed model forgets particular images, not random ones. Hendrycks and Dietterich (2019) built ImageNet-C to measure robustness to corruptions. Kuzmin et al. (2023) compared pruning with quantisation under equal training effort, at a size computed on paper. Miller et al. (2021) showed that accuracy on shifted data usually rises in step with clean accuracy. What I could not find is different compression methods compared against each other at the same <i>measured</i> size, with their failures broken down image by image and corruption by corruption.</p>
+<p>A phone, a drone or a small camera cannot comfortably hold an 88 MB model. P49 asks for a Vision Transformer under 10 MB. DeiT-Small, the model I start from, stores 22 million numbers, each in 32 bits; fitting under 10 MB leaves about 3.6 bits for each number. There are three standard ways to get there, and this project uses all of them. Each idea below is explained first, then named, then tied to its role here.</p>
+
+<div class="idea"><p><b>Weights and file size.</b> A trained neural network is mostly a long list of numbers that it learned during training. These numbers are called <b>weights</b>. Saving a model means saving its weights, so the file size is roughly the number of weights times the bits used for each one.</p>
+<p class="here">Here: DeiT-Small has 22,050,664 weights at 32 bits each, which is 88.2 MB. Everything in this project is about storing those weights in fewer bytes.</p></div>
+
+<div class="idea"><p><b>Storing each number with fewer bits.</b> A 32-bit number can hold billions of different values, but a network still works reasonably well if each weight is rounded to one of only a few allowed values. With 3 bits there are 8 allowed values; with 4 bits there are 16. To turn the small whole numbers back into real weights, the file also keeps a few extra numbers called <b>scales</b>, one for each small <b>group</b> of weights. This is called <b>quantisation</b>. It shrinks the file, but rounding loses some accuracy.</p>
+<p class="here">Here: route A stores every weight in 3 bits, the simplest way to get near 10 MB. Route B goes further and allows only three values, −1, 0 and +1, which is called <b>ternary</b>.</p></div>
+
+<div class="idea"><p><b>Deleting the least useful parts.</b> Some parts of a network contribute little. Removing whole rows of a weight matrix (called <b>channels</b>) makes the matrix genuinely smaller, so there are fewer weights to store. This is <b>structured pruning</b>.</p>
+<p class="here">Here: route C stores weights in 4 bits, but a 4-bit file is still 12.42 MB, so it also prunes 374 of the 1,536 channels in each block's middle layer.</p></div>
+
+<div class="idea"><p><b>Training a smaller network to copy a bigger one.</b> Instead of shrinking a big network, a smaller network (the <b>student</b>) can be trained to give the same answers as the big one (the <b>teacher</b>). This is <b>distillation</b>.</p>
+<p class="here">Here: route D trains DeiT-Tiny, a network with about a quarter of the weights, to copy DeiT-Small, then stores it in 8 bits.</p></div>
+
+<div class="idea"><p><b>Recovering after compression.</b> After rounding or deleting weights, the model is retrained briefly so it can adjust to the damage. This is <b>fine-tuning</b>.</p>
+<p class="here">Here: every model gets exactly the same 3000 steps of fine-tuning, so no model wins just because it was trained longer.</p></div>
+
+<p>I call each complete recipe (compress, then fine-tune) a <b>route</b>. This project compares four routes, A to D.</p>
+
+<div class="box"><p><b>The problem with the usual comparison.</b></p>
+<p>Compression papers usually compare methods on two numbers: accuracy on clean photos, and a model size worked out with a formula, number of weights × bits per weight ÷ 8. Both numbers hide something.</p>
+<p><i>The size.</i> A real file also stores the scales and keeps a few layers at higher precision, and the formula leaves both out. When each scale covers a whole row of weights, as in most vision papers, this adds only 2–5%, so the formula is a fair shortcut. But a hard 10 MB limit forces small groups and small models, where it is not: my real 2-bit DeiT-Small file is <b>29% bigger</b> than the formula says, and DeiT-Tiny's is <b>53% bigger</b>.</p>
+<p><i>The behaviour.</i> Two models with the same accuracy can still get <i>different</i> photos wrong, and can react very differently when a photo is noisy or blurred. One average hides that.</p></div>
+
+<p>Pieces of this are known. Hooker et al. (2019) showed that compression makes a model forget particular images, not random ones. Hendrycks and Dietterich (2019) built ImageNet-C, a standard set of artificially damaged photos. Kuzmin et al. (2023) compared pruning with quantisation under equal training effort, at a size computed on paper. What I could not find is different compression methods compared against each other at the same <i>real</i> file size, with their failures broken down photo by photo and damage type by damage type.</p>
+
 <div class="box"><p><b>The central idea of this proposal.</b></p>
-<p>Hold fixed the two things a deployment actually pays for, real bytes on disk and training effort, and change only the compression method. Then measure what changes: <b>do four models of exactly the same size fail on the same images, and does the model that wins on clean images still win on corrupted ones?</b> Because the size and the effort are controlled, any difference that is larger than plain seed-to-seed noise belongs to the method.</p></div>
+<p>Fix the two things a real deployment pays for, the bytes on disk and the training effort, and change only the compression method. Then ask: <b>do four models of exactly the same size fail on the same photos, and does the model that wins on clean photos still win on damaged ones?</b></p></div>
 
 <h2>2 Objectives</h2>
 <h3>Primary objectives</h3>
-<p><b>O1</b> Measure real file sizes against the formula, across bit-widths and five architectures, and find where the formula stops being accurate.</p>
-<p><b>O2</b> Build a fair race: compress DeiT-Small four ways to the same measured size (about 9.8 MB), each with the same 3000 steps of fine-tuning (short retraining after compression).</p>
-<p><b>O3</b> Determine whether equal-size models fail on the same images, and whether the clean ranking survives on each corruption. This is the central question.</p>
-<p><b>O4</b> Rule out luck: fine-tune every route with three random seeds and count only differences larger than the disagreement between two seeds of the same route.</p>
+<p><b>O1. Measure real file sizes.</b> Write compressed models to disk and compare their real size with the formula, at several bit-widths and for five networks of different sizes, to find where the formula stops being accurate.</p>
+<p><b>O2. Build a fair race.</b> Compress DeiT-Small four ways until all four real files are about the same size (around 9.8 MB), and give each the same fine-tuning.</p>
+<p><b>O3. Compare how they fail.</b> Test all four on clean photos and on each kind of damage, photo by photo, and check whether the ranking on clean photos survives on damaged ones. This is the central question.</p>
+<p><b>O4. Rule out luck.</b> Train every route three times and count only differences that are larger than the differences between two runs of the same route (Section 3 explains why).</p>
 <h3>Secondary objectives</h3>
-<p><b>O5</b> Build the P49 Pareto table: accuracy, size and CPU latency for every route and compression stage, showing which models no other model beats on every axis at once.</p>
-<p><b>O6</b> Check calibration (whether "90% sure" means right 90% of the time) per route, and whether a one-number correction (temperature scaling) removes the differences.</p>
-<p><b>O7</b> Determine whether ternary is specially weak under noise, or just weaker overall, by testing it against the clean-to-corrupted trend of five 3-bit models of different quality.</p>
+<p><b>O5. The P49 trade-off table.</b> Put accuracy, file size and CPU speed side by side for every route, and mark the models that no other model beats on all three at once. Such a table is called a <b>Pareto table</b>.</p>
+<p><b>O6. Honest confidence.</b> A model gives a confidence with every answer. If it says "90% sure", it should be right about 90% of the time; how well this holds is called <b>calibration</b>. Check whether the routes differ, and whether a one-number correction (<b>temperature scaling</b>) removes the difference.</p>
+<p><b>O7. Is ternary weak on noise, or just weaker?</b> Explained in Section 6.2.</p>
 <table>
-<tr><th style="width:11%">Objective</th><th>Why it is not already answered in the literature</th></tr>
-<tr><td>O1</td><td>Language-model papers count the extra bytes (SpQR, 2023). The vision papers I read set budgets in average bits per weight, a fair convention for their per-channel scales; none measures where it fails across group sizes and model sizes.</td></tr>
-<tr><td>O2</td><td>Kuzmin et al. (NeurIPS 2023) compare two methods at a theoretical size (no storage cost assumed for the pruning mask), use unstructured magnitude pruning, and test combining them only briefly, leaving it as future work.</td></tr>
-<tr><td>O3</td><td>Robustness studies compare compressed models with their uncompressed original; Hooker et al. do this per corruption, for pruning. Different methods compared against each other at the same measured size, per corruption, I could not find.</td></tr>
-<tr><td>O4</td><td>Hooker et al. control seed noise with populations of 30 trained models, but compare compressed with uncompressed models, not different compression methods with each other.</td></tr>
-<tr><td>O5</td><td>Required by P49. Papers report size and accuracy, rarely CPU latency for the same files.</td></tr>
-<tr><td>O6–O7</td><td>Calibration (Guo et al., 2017) and the clean-to-corrupted trend (Miller et al., 2021) are known, but are not compared across compression methods at equal size.</td></tr>
+<tr><th style="width:11%">Objective</th><th>Why it is not already answered</th></tr>
+<tr><td>O1</td><td>Language-model papers count the extra bytes (SpQR, 2023). The vision papers I read use the formula, which is fair for their setting; none measures where it stops being accurate.</td></tr>
+<tr><td>O2</td><td>Kuzmin et al. (NeurIPS 2023) compare two methods at a size worked out on paper and test combining them only briefly, leaving it as future work.</td></tr>
+<tr><td>O3–O4</td><td>Earlier studies compare a compressed model with its own uncompressed original (Hooker et al. do this per damage type, using several independently trained models per setting). Different methods compared against each other at the same real size, I could not find.</td></tr>
+<tr><td>O5</td><td>Required by P49. Papers report size and accuracy, rarely CPU speed for the same files.</td></tr>
+<tr><td>O6–O7</td><td>Calibration (Guo et al., 2017) and the clean-to-damaged trend (Miller et al., 2021) are known, but are not compared across compression methods at equal size.</td></tr>
 </table>
 
 <h2>3 Novelty</h2>
-<p>The novelty is not a new compression method; every route uses published techniques. It is a measurement the field does not usually make, and a design that keeps it fair.</p>
-<p><b>N1. Equal measured bytes, not equal bit-width.</b> Each route has one setting that is searched until its real file is about 9.77 MB. The four files end up within 0.8% of each other.</p>
-<p><b>N2. Equal effort.</b> Every route gets the same 3000 fine-tuning steps, optimiser and learning rate, following the equal-effort control of Kuzmin et al.</p>
-<p><b>N3. Luck measured, not assumed.</b> Three seeds per route give a seed floor: how often two runs of the same method disagree by chance. A difference between routes counts only if it beats this floor.</p>
-<p><b>N4. Failures by type, with architecture kept apart.</b> Results are reported per corruption and per corruption family. Three routes keep DeiT-Small's shape; only distillation changes it, so same-shape comparisons are reported separately.</p>
-<p><b>N5. Predictions written down first.</b> Four predictions were written into the analysis script before it was run, and the ones that failed are reported as failed.</p>
+<p>I am not proposing a new compression method; every route uses published techniques. What is new is a fair comparison, built from five design choices.</p>
+<p><b>N1. Equal real size, not equal bits per weight.</b> Because P49 sets a hard 10 MB limit, I compare the actual file on disk rather than the formula. Each route has one setting (for route A, how many weights share one scale) that I adjust until its real file is about 9.8 MB. The four files end up within 0.8% of each other.</p>
+<p><b>N2. Equal effort.</b> Every route gets the same 3000 fine-tuning steps with the same settings, following Kuzmin et al.</p>
+<p><b>N3. Luck measured, not assumed.</b> Training a neural network involves random choices, such as the order in which photos are shown. The number that fixes these choices is called a <b>seed</b>. Two runs of the <i>same</i> route with different seeds produce slightly different models, which disagree on some photos. So if two <i>different</i> routes disagree on some photos, that alone does not prove the compression method is responsible.</p>
+<p>To measure this natural variation, I train each route three times with different seeds and first measure how often two runs of the same route disagree. I call this the <b>seed floor</b>. For example, two runs of the 3-bit route disagree on 8.5% of the 50,000 clean photos. I then compare it with how often two <i>different</i> routes disagree: the 3-bit and ternary routes disagree on 12.3%, against a combined seed floor of 9.0%, which is 1.4 times higher. A difference between routes counts only if it is clearly above the seed floor.</p>
+<p><b>N4. Damage type by damage type.</b> Results are reported for each kind of damage, not one average. Three routes keep DeiT-Small's network; only route D changes it, so results for A, B and C are also reported on their own.</p>
+<p><b>N5. Predictions written first.</b> Before the main analysis, I wrote four predictions into the analysis script, and report the ones that turned out wrong.</p>
 
 <h2>4 Data and Reference Numbers: What Has Been Verified</h2>
-<p>The figures below were measured or checked against the published papers before this proposal was written.</p>
+<p>The figures below were measured, or checked against the published papers, before this proposal was written.</p>
 <h3>Inventory</h3>
 <table>
-<tr><th style="width:21%">Asset</th><th>Structure</th><th style="width:24%">Role</th></tr>
-<tr><td>ImageNet-1k validation</td><td>50,000 images, 1,000 classes, read in a fixed order from 64 archive shards</td><td>Clean accuracy</td></tr>
-<tr><td>ImageNet-C (generated)</td><td>14 of the 15 standard corruptions (glass blur excluded) at severity 3, applied with fixed seeds to the first 5,000 validation images</td><td>Corruption accuracy</td></tr>
-<tr><td>ImageNet-1k train, ~20%</td><td>200 archive shards of the training set</td><td>Fine-tuning only</td></tr>
-<tr><td>DeiT-Small, DeiT-Tiny</td><td>Pretrained weights from the timm library</td><td>Starting points; teacher and student</td></tr>
+<tr><th style="width:21%">Data</th><th>What it is</th><th style="width:22%">Used for</th></tr>
+<tr><td>ImageNet-1k validation</td><td>50,000 photos in 1,000 classes, read in a fixed order</td><td>Clean accuracy</td></tr>
+<tr><td>ImageNet-C (made by me)</td><td>14 of the 15 standard damage types (noise, blur, weather and digital), at severity 3 of 5, applied with fixed random seeds to the first 5,000 validation photos</td><td>Accuracy on damaged photos</td></tr>
+<tr><td>ImageNet-1k training, ~20%</td><td>200 of the 1,024 training-data files</td><td>Fine-tuning only</td></tr>
+<tr><td>DeiT-Small, DeiT-Tiny</td><td>Pretrained models from the timm library</td><td>Starting points; teacher and student</td></tr>
 </table>
-<h3>Published reference numbers to be matched</h3>
+<h3>Published reference numbers</h3>
 <table>
-<tr><th style="width:24%">Model</th><th style="width:25%">Published</th><th style="width:23%">Measured here</th><th>Role in this study</th></tr>
-<tr><td>DeiT-Small, 32-bit</td><td>79.8% top-1, 88.2 MB</td><td>79.72%, 88.24 MB</td><td>Reproduction target; the baseline</td></tr>
-<tr><td>DeiT-Tiny, 32-bit</td><td>72.2% top-1</td><td>72.02%, 22.90 MB</td><td>Starting network for route D</td></tr>
-<tr><td>Mix-QViT, 4-bit DeiT-Small</td><td>11.4 MB (formula)</td><td>Rebuilt to 0.03 MB</td><td>Example of a formula size; a real file built their way is 2–5% larger</td></tr>
-<tr><td>FTerViT, ternary DeiT-Small</td><td>77.47% at 5.81 MB</td><td>Not reimplemented</td><td>Upper reference: 260 epochs and 8-bit activations, against 3000 steps here</td></tr>
+<tr><th style="width:23%">Model</th><th style="width:25%">Published</th><th style="width:22%">Measured by me</th><th>Role here</th></tr>
+<tr><td>DeiT-Small, 32-bit</td><td>79.8% accuracy, 88.2 MB</td><td>79.72%, 88.24 MB</td><td>Reproduction target; the baseline</td></tr>
+<tr><td>DeiT-Tiny, 32-bit</td><td>72.2% accuracy</td><td>72.02%, 22.90 MB</td><td>Starting network for route D</td></tr>
+<tr><td>Mix-QViT, 4-bit DeiT-Small</td><td>11.4 MB (formula)</td><td>Rebuilt to within 0.03 MB</td><td>A formula size; a real file built their way is 2–5% larger</td></tr>
+<tr><td>FTerViT, ternary DeiT-Small</td><td>77.47% at 5.81 MB</td><td>Not reimplemented</td><td>Upper reference, after over 400 times more training</td></tr>
 </table>
-<p>Two observations follow and shape the design. First, the published baseline is reproduced to within 0.08 points in my own pipeline, so every accuracy loss below is measured, not quoted. Second, FTerViT shows a ternary DeiT-Small can reach 77.47%, but after over 400 times more training (260 epochs, against 3000 steps of 256 images here); a comparison under equal effort must not be read against it.</p>
-<h3>Three structural properties that constrain the design</h3>
-<p><b>4-bit alone cannot fit.</b> A real 4-bit DeiT-Small file is 12.42 MB, 24% over the limit, so a 4-bit route must also prune. This was measured before any route was built, and is why route C combines two methods.</p>
-<p><b>The same 5,000 images recur in every corruption.</b> The 14 corruptions are 5,000 independent samples, not 70,000. Every statistic uses the image as its unit; counting 70,000 would inflate certainty by about √14 ≈ 3.7 times.</p>
-<p><b>Only one route changes the architecture.</b> Route D uses DeiT-Tiny, so any result involving D may come from the different network rather than from compression. Same-shape results (A, B, C) are always reported on their own.</p>
+<p>Because the published baseline is reproduced within 0.1 points, every accuracy loss in this project is my own measurement, not a quoted one. FTerViT shows a ternary DeiT-Small can reach 77.47%, but after 260 epochs of training against my 3000 steps, so my results must not be read against it.</p>
+<h3>Three facts that shape the design</h3>
+<p><b>4-bit alone cannot fit.</b> A real 4-bit DeiT-Small file is 12.42 MB, 24% over the limit. This was measured before any route was built, and is why route C also prunes.</p>
+<p><b>The same 5,000 photos appear in all 14 damage types.</b> So the damaged results come from 5,000 independent photos, not 70,000. Every statistic treats the photo as the unit; counting 70,000 would make results look about 3.7 times more certain than they are.</p>
+<p><b>Only one route changes the network.</b> Route D uses DeiT-Tiny, so any result involving D might come from the different network rather than from compression. That is why A, B and C are also compared on their own.</p>
 
 <h2>5 Methods</h2>
 <h3>5.1 What the system outputs</h3>
-<p>For each of the 12 route models and 5 ablation models, the pipeline outputs: a model file whose size is read from disk; a right/wrong answer for each of the 50,000 clean and 70,000 corrupted images, with each model's accuracy, mean confidence and calibration error; and, per network, a CPU latency. Every comparison in this study is built from those per-image answers, so two models can be compared on exactly the same images.</p>
-<h3>5.2 Routes to be compared</h3>
+<p>For each model, the pipeline produces: the model file, whose size is read from disk; a right/wrong answer for each of the 50,000 clean and 70,000 damaged photos, with the model's accuracy, average confidence and calibration error; and, for each network, its CPU speed. Every comparison is built from the per-photo answers, so two models are always compared on exactly the same photos.</p>
+<h3>5.2 The four routes</h3>
 <table>
-<tr><th style="width:5%">#</th><th style="width:30%">Route</th><th style="width:21%">Setting searched</th><th>Why it is included</th></tr>
-<tr><td>A</td><td>3-bit: every weight rounded to one of 8 values</td><td>Group size (36 weights per scale)</td><td>Plain quantisation, the simplest way under 10 MB. The reference route.</td></tr>
-<tr><td>B</td><td>Ternary: every weight −1, 0 or +1, five packed per byte</td><td>Sensitive layers kept at 8 bits (15)</td><td>The most extreme rounding; popular because it needs only additions.</td></tr>
-<tr><td>C</td><td>4-bit + structured pruning of whole channels</td><td>MLP channels pruned (374 of 1,536, 24.3%)</td><td>Combines quantisation and pruning; needed because 4-bit alone is 12.42 MB.</td></tr>
-<tr><td>D</td><td>Distil into DeiT-Tiny, then 8-bit</td><td>Layers kept at 16 bits (38)</td><td>Combines distillation and quantisation; the only route that changes the network.</td></tr>
+<tr><th style="width:5%">#</th><th style="width:31%">What it does</th><th style="width:22%">Setting adjusted to hit ~9.8 MB</th><th>Why it is included</th></tr>
+<tr><td>A</td><td>Every weight stored in 3 bits</td><td>Weights per scale (36)</td><td>The simplest way under 10 MB; the reference route</td></tr>
+<tr><td>B</td><td>Ternary: every weight −1, 0 or +1, five packed into one byte</td><td>Most sensitive layers kept at 8 bits (15)</td><td>The most extreme rounding</td></tr>
+<tr><td>C</td><td>4 bits plus structured pruning</td><td>Channels pruned (374 of 1,536, 24.3%)</td><td>Combines quantisation and pruning</td></tr>
+<tr><td>D</td><td>Distil into DeiT-Tiny, then 8 bits</td><td>Layers kept at 16 bits (38)</td><td>Combines distillation and quantisation; the only route that changes the network</td></tr>
 </table>
-<h3>5.3 The size model and the comparison</h3>
-<p>Papers estimate size from the number of weights N and the bits b. A real file also stores one 16-bit scale per group of g weights, keeps some N<sub>k</sub> weights at 16 bits, and has a small header:</p>
+<h3>5.3 Size and disagreement, as formulas</h3>
+<p>For N weights at b bits, the formula and the real file are:</p>
 <div class="eq">S<sub>formula</sub> = N · b / 8 &nbsp;&nbsp;&nbsp;&nbsp; S<sub>real</sub> = N<sub>q</sub> · b / 8 + (N<sub>q</sub> / g) · 2 + N<sub>k</sub> · 2 + header &nbsp;&nbsp; (bytes) &nbsp;&nbsp;&nbsp;(1)</div>
-<p>Each route's setting is chosen by a binary search on S<sub>real</sub> measured from the written file, never on accuracy. Failure overlap between two models x and y over n images is the share of images where exactly one of them is right, with c<sub>x</sub>(i) = 1 if model x answers image i correctly:</p>
-<div class="eq">d(x, y) = (1/n) · Σ<sub>i</sub> 1[ c<sub>x</sub>(i) ≠ c<sub>y</sub>(i) ] &nbsp;&nbsp;&nbsp;&nbsp; ratio = d(route 1, route 2) / d(seed 1, seed 2) &nbsp;&nbsp;&nbsp;(2)</div>
-<p>A ratio above 1, with a confidence range that excludes 1, means the routes differ by more than luck.</p>
-<div class="box"><p><b>What this design buys, and what it costs.</b></p>
-<p>It buys a comparison where size and effort cannot explain a difference. It costs absolute accuracy: 3000 steps on 20% of ImageNet is far less than published methods use, so the routes sit below their best possible accuracy, and the ranking belongs to this budget. Every comparison is therefore route against route, never route against a published number.</p></div>
-<h3>5.4 Ablation — this is the actual experiment (O3, O4, O5)</h3>
+<p>where N<sub>q</sub> weights are rounded, g weights share each 2-byte scale, and N<sub>k</sub> weights are kept at 16 bits. Each route's setting is found by trying a value, writing the real file, measuring it, and narrowing the range until the file lands just under the target. Accuracy is never used to choose it.</p>
+<p>Disagreement between two models x and y is the share of the n photos where exactly one of them is right, with c<sub>x</sub>(i) = 1 if model x gets photo i right:</p>
+<div class="eq">d(x, y) = (1/n) · Σ<sub>i</sub> 1[ c<sub>x</sub>(i) ≠ c<sub>y</sub>(i) ] &nbsp;&nbsp;&nbsp;&nbsp; ratio = d(two routes) / d(two seeds of one route) &nbsp;&nbsp;&nbsp;(2)</div>
+<p>A ratio clearly above 1 means the routes differ by more than luck.</p>
+<div class="box"><p><b>What this design buys, and what it costs.</b> It buys a comparison where size and training effort cannot explain a difference. It costs absolute accuracy: 3000 steps on 20% of ImageNet is far less training than published methods use, so every route sits below its best possible accuracy. Every comparison is therefore route against route, never against a published number.</p></div>
+<h3>5.4 Ablation — this is the actual experiment</h3>
 <table>
-<tr><th style="width:6%">Arm</th><th style="width:42%">What is compared</th><th>Question it answers</th></tr>
-<tr><td>A</td><td>The four routes ranked by clean top-1</td><td>The ranking papers report.</td></tr>
-<tr><td>B</td><td>The same four, same images, ranked on each corruption</td><td>The ranking a deployment would care about.</td></tr>
-<tr><td>C</td><td>Route-to-route disagreement against the seed floor, Eq. (2)</td><td><b>The headline result.</b> O3 and O4 in one number.</td></tr>
-<tr><td>D</td><td>Route A rebuilt at group sizes 512, 256, 128, 64, 32</td><td>What each extra byte buys (O5); the trend line for O7.</td></tr>
-<tr><td>E</td><td>Arms A–C repeated for the same-shape routes only</td><td>Does the result survive with architecture fixed?</td></tr>
+<tr><th style="width:6%">Arm</th><th style="width:44%">What is compared</th><th>Question it answers</th></tr>
+<tr><td>A</td><td>The four routes ranked by clean accuracy</td><td>The ranking papers usually report</td></tr>
+<tr><td>B</td><td>The same four, same photos, ranked on each damage type</td><td>The ranking a real deployment cares about</td></tr>
+<tr><td>C</td><td>Disagreement between routes, against the seed floor, Eq. (2)</td><td><b>The headline result</b> (O3 and O4)</td></tr>
+<tr><td>D</td><td>Route A rebuilt with 32, 64, 128, 256 and 512 weights per scale</td><td>What each extra byte buys (O5); the trend line for O7</td></tr>
+<tr><td>E</td><td>Arms A–C repeated for routes A, B and C only</td><td>Does the result hold when the network is the same?</td></tr>
 </table>
-<p><b>Arm C is the arm that determines whether this study has a result.</b> If routes disagree no more than seeds do, the finding is that equal-size compressed models are interchangeable, a useful negative that the field currently assumes without evidence.</p>
+<p><b>Arm C decides whether this study has a result.</b> If routes disagree no more than two runs of one route do, the finding is that equal-size compressed models are interchangeable, which is a useful negative result in itself.</p>
 
 <h2>6 Evaluation Protocol</h2>
 <h3>6.1 Metrics</h3>
 <table>
-<tr><th style="width:19%">Metric</th><th style="width:42%">Definition</th><th>Why</th></tr>
-<tr><td>Clean accuracy</td><td>Top-1 on all 50,000 validation images</td><td>Comparability with every published table</td></tr>
-<tr><td>Corruption accuracy</td><td>Top-1 on each of the 14 corruptions, 5,000 images each</td><td>Shows which damage hurts which route</td></tr>
-<tr><td>Failure overlap</td><td>Eq. (2), between routes and between seeds</td><td>The primary metric for O3–O4</td></tr>
-<tr><td>Calibration (ECE)</td><td>Gap between confidence and accuracy, averaged over 15 confidence bins</td><td>Is "90% sure" really 90%? (O6)</td></tr>
-<tr><td>File size</td><td>Bytes on disk, Eq. (1) as a second derivation</td><td>The budget itself</td></tr>
-<tr><td>CPU latency</td><td>Median time per image over 50 runs, batch 1</td><td>The third P49 axis</td></tr>
+<tr><th style="width:20%">Metric</th><th style="width:42%">What it measures</th><th>Why</th></tr>
+<tr><td>Clean accuracy</td><td>Share of the 50,000 photos where the model's first guess is right (top-1)</td><td>Comparable with every paper</td></tr>
+<tr><td>Damaged accuracy</td><td>The same, on each of the 14 damage types</td><td>Shows which damage hurts which route</td></tr>
+<tr><td>Disagreement</td><td>Eq. (2), between routes and between seeds</td><td>The main measure for O3–O4</td></tr>
+<tr><td>Calibration error</td><td>Average gap between confidence and accuracy (ECE, 15 confidence bands)</td><td>Is "90% sure" really 90%? (O6)</td></tr>
+<tr><td>File size</td><td>Bytes on disk, with Eq. (1) as a second check</td><td>The budget itself</td></tr>
+<tr><td>CPU speed</td><td>Median time per photo over 50 runs</td><td>The third P49 axis</td></tr>
 </table>
-<p class="note">Clean accuracy is never reported alone. It appears beside the corruption results it is being tested against.</p>
-<h3>6.2 The primary analysis (O3, O4)</h3>
-<div class="box"><p><b>Pre-declared expected direction.</b></p>
-<p>Before the main analysis I wrote four predictions into the analysis script. (1) Two seeds of the same route disagree on 3–6% of images. (2) The distilled model beats ternary on at least 8 of the 14 corruptions, most of all on noise. (3) Within the same architecture, ternary's gap grows on corrupted images. (4) Every route's calibration error equals the plain gap between accuracy and confidence. For O7 the rule is fixed in advance: ternary counts as below the trend only if the 95% range of its gap on noise excludes zero.</p>
-<p><b>Outcome so far:</b> (1) was wrong, the seed floor is 6.3–9.6%, and it is reported that way; (2) held, 11 of 14; (3) held; (4) held on clean images only.</p></div>
+<h3>6.2 The primary analysis, and what I expected</h3>
+<p><b>What "ternary's gap" means.</b> The gap is the difference in accuracy between the 3-bit route and the ternary route. On clean photos, 3-bit is ahead by about 3.5–3.9 points. The question is whether that gap stays the same on damaged photos or grows; on these 5,000 photos it grows to 10.4–11.1 points.</p>
+<p><b>O7, the trend line.</b> Across many models, a model that is better on clean photos is usually better on damaged ones too, by a predictable amount (Miller et al., 2021). To find that "normal" amount for DeiT-Small, I use route A rebuilt with five different numbers of weights per scale, which gives five 3-bit models of slightly different quality. Plotting their clean against damaged accuracy draws a trend line. If ternary falls clearly below that line on noise, it is specially weak on noise; if it sits on the line, it is simply a weaker model.</p>
+<div class="box"><p><b>Predictions written before the main analysis.</b> (1) Two runs of the same route disagree on 3–6% of photos. (2) The distilled model beats ternary on at least 8 of the 14 damage types, most of all on noise. (3) Among A, B and C, ternary's gap grows on damaged photos. (4) Each route's calibration error equals the plain gap between its accuracy and its average confidence. For O7 the rule was fixed in advance: ternary counts as below the trend only if the 95% range of its gap on noise excludes zero.</p>
+<p><b>Outcome so far:</b> (1) was wrong: the seed floor is 6.3–9.6%, and I report it that way. (2) held, on 11 of 14. (3) held. (4) held on clean photos only.</p></div>
 <h3>6.3 Splits, and an honest statement about tuning</h3>
-<p>Fine-tuning uses only training images. Each route's setting was chosen by file size alone, never by accuracy. During fine-tuning the validation set is only logged; the exported model is always the one at step 3000, not the best checkpoint, so no choice is tuned on the reported images. Corruptions are generated once with fixed seeds and reused for every model. For calibration, the temperature is fitted on even-numbered validation images and the error is reported on odd-numbered ones.</p>
+<p>Fine-tuning uses only training photos. Each route's setting was chosen by file size alone, never by accuracy. During fine-tuning the test photos are only logged: the saved model is always the one at step 3000, not the best-looking checkpoint, so no choice is tuned on the photos I report. The damaged photos are generated once and reused for every model. For calibration, the correction is fitted on half the test photos and checked on the other half.</p>
 <h3>6.4 Mandatory negative controls</h3>
-<p><b>1. File round trip.</b> Every saved file is read back into a model and written again; it must come out byte-identical. All 21 do.</p>
-<p><b>2. Re-score from the files.</b> Every model is reloaded from its file on a different GPU and re-tested. Per-image answers must match the original run up to rounding; 99.71% do.</p>
-<p><b>3. Two derivations of every size.</b> Each file is measured on disk and rebuilt from the layer shapes with Eq. (1). All 80 audited files agree to within the header.</p>
-<p><b>4. Seed floor.</b> Two seeds of the same route, compared with Eq. (2), in every table, so a route difference cannot be mistaken for luck.</p>
+<p><b>1. File round trip.</b> Every saved file is read back into a model and written again; it must come out byte-for-byte identical. All 21 do.</p>
+<p><b>2. Re-score from the files.</b> Every model is reloaded from its file on a different GPU and re-tested; 99.71% of per-photo answers match the original run.</p>
+<p><b>3. Two derivations of every size.</b> Each file is measured on disk and also rebuilt from the network's shape with Eq. (1); all 80 audited files agree.</p>
+<p><b>4. Seed floor.</b> Reported next to every comparison between routes, so a difference cannot be mistaken for luck.</p>
 <h3>6.5 Mandatory stratified reporting</h3>
-<p>Every headline result is additionally reported: (i) by corruption family (noise, blur, weather, digital), because the routes differ most by family; (ii) for the three same-shape routes on their own, because route D changes the network; (iii) with per-seed values, not only means. If seed spread exceeds a gap between routes, that is the result and it is reported as such.</p>
+<p>Every main result is also reported (i) by damage family (noise, blur, weather, digital), (ii) for routes A, B and C on their own, and (iii) for each seed separately. Models are compared photo by photo with a standard paired test (McNemar's test), and when many tests are run each must pass a stricter bar (Bonferroni correction). Results are given as ranges, not just "significant".</p>
 
 <h2>7 Work Plan and Gates</h2>
-<p>Each phase ends with a gate: a concrete pass/fail test. The next phase does not begin until the gate passes, so that an error is found in the phase that made it. Phases 0–2 were completed before Week 3 and Phase 3 in Week 3.</p>
-<h3>Phase 0 — Size audit (complete)</h3>
-<div class="gate pass"><b class="t">GATE 0 — PASSED</b>
-<div>✓ Real sizes measured for DeiT-Small at several bit-widths and for five architectures</div>
-<div>✓ Every size rebuilt from layer shapes with Eq. (1); 80 of 80 files agree</div>
+<p>Each phase ends with a gate, a pass/fail check, so that an error is caught in the phase that made it. Phases 0–2 were completed before Week 3 and Phase 3 in Week 3.</p>
+<div class="gate"><b class="t">GATE 0 — Size audit (PASSED)</b>
+<div>✓ Real sizes measured for five networks; each rebuilt from its shape with Eq. (1), 80 of 80 agree</div>
 <div>✓ 4-bit alone found not to fit (12.42 MB), so route C must prune</div></div>
-<h3>Phase 1 — Equal-size routes (complete)</h3>
-<div class="gate pass"><b class="t">GATE 1 — PASSED</b>
-<div>✓ Four routes at 9.72–9.80 MB, within 0.8% of each other</div>
-<div>✓ Fine-tuned with three seeds each under one recipe: 3000 steps, batch 256, AdamW, learning rate 1e-4 with cosine decay</div></div>
-<h3>Phase 2 — Evaluation and statistics (complete)</h3>
-<div class="gate pass"><b class="t">GATE 2 — PASSED</b>
-<div>✓ Clean and 14-corruption accuracy for all 12 models; seed floor measured</div>
-<div>✓ Paired tests (McNemar, bootstrap) with Bonferroni correction; predictions checked</div>
-<div>✓ First Pareto table: CPU latency on an Apple M2</div></div>
-<h3>Phase 3 — Re-check everything (complete, Kaggle T4, 51 minutes)</h3>
-<div class="gate pass"><b class="t">GATE 3 — PASSED</b>
-<div>✓ Models re-scored from their files: 99.71% of per-image answers match</div>
-<div>✓ Baseline reproduced: 79.72% (published 79.8%); the final model loses 3.2 points</div>
-<div>✓ Calibration before and after temperature scaling; O7 trend test run</div>
-<div>✓ CPU latency on a second processor (Intel); one command rebuilds every table</div></div>
-<h3>Phase 4 — Figures and report (Weeks 6–9)</h3>
-<div class="gate"><b class="t">GATE 4 — includes the Week-6 checkpoint</b>
-<div>■ Repository link submitted with the main tables and control outputs (Week 6)</div>
-<div>■ Two papers seen only in summary read in full, or dropped from the claims</div>
-<div>■ <code>reproduce.sh</code> regenerates every table and figure from a clean checkout</div>
-<div>■ Limitations and withdrawn claims written before the figures are polished</div>
-<div>■ AI-assistance declaration completed; 4–6 page CVPR report</div></div>
+<div class="gate"><b class="t">GATE 1 — Equal-size routes (PASSED)</b>
+<div>✓ Four routes at 9.72–9.80 MB, within 0.8%; each trained with three seeds, 3000 steps, one shared recipe</div></div>
+<div class="gate"><b class="t">GATE 2 — Evaluation and statistics (PASSED)</b>
+<div>✓ Clean and damaged accuracy for all 12 models; seed floor measured; predictions checked; first Pareto table</div></div>
+<div class="gate"><b class="t">GATE 3 — Re-check everything (PASSED, Kaggle T4, 51 minutes)</b>
+<div>✓ Models re-scored from their files (99.71% match); baseline 79.72%, so the final model loses 3.2 points</div>
+<div>✓ Calibration and the O7 trend test run; CPU speed on a second processor; one command rebuilds every table</div></div>
+<div class="gate"><b class="t">GATE 4 — Report (Weeks 6–9, includes the Week-6 checkpoint)</b>
+<div>■ Repository link with the main tables submitted at Week 6</div>
+<div>■ Two papers seen only in summary read in full, or dropped</div>
+<div>■ Limitations written before figures are polished; AI-assistance declaration; 4–6 page CVPR report</div></div>
 
 <h2>8 Planned Figures</h2>
-<p>Eight figures, all drawn by a script from saved results; seven already exist.</p>
-<p><b>Fig. 1. Design.</b> One starting model, four routes, every file searched to the same size, the same fine-tuning, the same tests.</p>
-<p><b>Fig. 2. The size gap.</b> Formula against real file for DeiT-Small at four bit-widths, and the 2-bit gap across four Vision Transformers, so the growth of the error as models shrink is visible.</p>
-<p><b>Fig. 3. Routes against luck.</b> The primary figure. Disagreement between two seeds of one route beside disagreement between two routes, for all six route pairs, with the ratio on each bar.</p>
-<p><b>Fig. 4. The two rankings.</b> The four routes on clean images on the left and on corrupted images on the right, with lines joining the same route. Crossing lines are the result.</p>
-<p><b>Fig. 5. By corruption family.</b> Accuracy per route for noise, blur, weather and digital damage, showing which route each kind of damage hurts most.</p>
-<p><b>Fig. 6. Pareto plot.</b> Clean accuracy against CPU latency per image, with the best-trade-off line drawn and the uncompressed model marked.</p>
-<p><b>Fig. 7. Inside each file.</b> What fills each ~9.8 MB file: codes, scales and layers kept at higher precision.</p>
-<p><b>Fig. 8. Calibration and the trend line.</b> Calibration error before and after temperature scaling per route, and ternary placed against the clean-to-corrupted trend of the five ablation models (still to draw).</p>
+<p>All drawn by a script from saved results; seven already exist.</p>
+<p><b>Fig. 1. Design:</b> one starting model, four routes, the same size, the same fine-tuning, the same tests. <b>Fig. 2. The size gap:</b> formula against real file for DeiT-Small at four bit-widths, and at 2 bits across four Vision Transformers of different sizes. <b>Fig. 3. Routes against luck:</b> disagreement between two seeds of one route beside disagreement between two routes, for all six pairs. <b>Fig. 4. Two rankings:</b> the routes on clean and on damaged photos, with lines joining the same route; crossing lines are the result. <b>Fig. 5. By damage family:</b> which route each kind of damage hurts most. <b>Fig. 6. Pareto plot:</b> accuracy against CPU speed. <b>Fig. 7. Inside each file:</b> codes, scales and higher-precision layers. <b>Fig. 8. Calibration and the trend line</b> (still to draw).</p>
 
 <h2>9 Timeline</h2>
 <table>
 <tr><th style="width:36%">Phase</th><th style="width:15%">Weeks</th><th>Gate</th></tr>
-<tr><td>0 — Size audit</td><td>before W3</td><td>Passed</td></tr>
-<tr><td>1 — Equal-size routes</td><td>before W3</td><td>Passed: four files within 0.8%</td></tr>
-<tr><td>2 — Evaluation and statistics</td><td>before W3</td><td>Passed: seed floor and paired tests</td></tr>
+<tr><td>0–2 — Sizes, routes, evaluation</td><td>before W3</td><td>Passed</td></tr>
 <tr><td>3 — Re-check everything</td><td>W3</td><td>Passed: re-score matches 99.71%</td></tr>
-<tr><td>4 — Figures and report</td><td>6–9</td><td>Repository at <b>Week-6 checkpoint</b>; reproduction script runs</td></tr>
+<tr><td>4 — Figures and report</td><td>6–9</td><td>Repository at the <b>Week-6 checkpoint</b>; reproduction script runs</td></tr>
 </table>
-<p><b>What is dropped if the project falls behind, in this order:</b> Fig. 8 first; then O7; then O6. Objectives O1–O5 are not droppable: they are complete and they are the project.</p>
-<p><b>Compute.</b> All training and evaluation is finished. The report needs only a laptop: <code>reproduce.sh</code> rebuilds every statistic and table from the saved per-image results in about 45 seconds.</p>
+<p><b>What is dropped if time runs short, in this order:</b> Fig. 8, then O7, then O6. O1–O5 are complete and are not dropped. <b>Compute:</b> all training and testing is finished; the report needs only a laptop, and <code>reproduce.sh</code> rebuilds every table in about 45 seconds.</p>
 
 <h2>10 Risk Register and Contingencies</h2>
 <table>
 <tr><th style="width:38%">Risk</th><th>Response</th></tr>
-<tr><td>A paper already did this comparison</td><td>Cite it, narrow the claim to what it does not cover, and say so.</td></tr>
-<tr><td>A route difference is smaller than the seed floor</td><td>Report it as no real difference. Reporting only the best seed would be misconduct.</td></tr>
-<tr><td>The ternary/distilled flip is explained by architecture</td><td>Agreed in advance: it is stated as a deployment result, and the same-shape results (Arm E) stand on their own.</td></tr>
+<tr><td>A paper already did this comparison</td><td>Cite it, narrow my claim to what it does not cover, and say so.</td></tr>
+<tr><td>A difference between routes is smaller than the seed floor</td><td>Report it as no real difference. Reporting only the best seed would be misconduct.</td></tr>
+<tr><td>The ternary vs distilled result is explained by the different network</td><td>Agreed in advance: it is stated as a deployment result, and routes A, B and C are reported on their own.</td></tr>
 <tr><td>A number in the report cannot be rebuilt</td><td>Remove it. Every number must come out of <code>reproduce.sh</code>.</td></tr>
-<tr><td>Time runs short</td><td>Drop in the order given in Section 9. O1–O5 are never dropped.</td></tr>
 </table>
 <h3>Limitations stated up front</h3>
-<p>• Only the weights are compressed, not the activations (the numbers computed while the model runs), so these accuracies must not be compared with papers that do both.</p>
-<p>• Fine-tuning used about 20% of ImageNet for 3000 steps. Nothing had finished improving: ternary was still gaining faster than 3-bit, so the ranking belongs to this budget.</p>
-<p>• No single model stacks all three methods. Each route combines at most two (C: pruning and quantisation; D: distillation and quantisation), so that every comparison changes one thing at a time; a model using all three is left as an extension.</p>
-<p>• ImageNet-C is regenerated, so numbers do not match published ImageNet-C scores. Every route sees identical corruptions, so comparisons between routes are fair.</p>
-<p>• Ternary sits 4–5 points below the trend line on noise in all three seeds, but this does not pass a Bonferroni-strict test, so it is reported as consistent, not proven. Miller et al. also note that Gaussian noise is a shift where the trend line often breaks down, so the O7 test rests on a trend that may not hold for noise.</p>
+<p>• Only the weights are compressed, not the activations (the numbers computed while the model runs), so these accuracies must not be compared with papers that compress both.</p>
+<p>• Fine-tuning used about 20% of ImageNet for 3000 steps. Ternary was still improving fastest at the end (0.9–1.4 points over the last 1,000 steps, against at most 0.6 for the other routes), so the ranking belongs to this training budget.</p>
+<p>• No single model uses all three methods. Each route combines at most two, so that every comparison changes one thing at a time; a model using all three is left as an extension.</p>
+<p>• The damaged photos are regenerated, so scores do not match published ImageNet-C numbers. Every route sees identical damage, so comparisons between routes are fair.</p>
+<p>• Ternary sits 4–5 points below the trend line on noise in all three seeds, but this does not pass the stricter Bonferroni test, so I report it as consistent, not proven. Miller et al. also note that noise is a damage type where the trend line often breaks down.</p>
 
 <h2>11 Expected Contributions</h2>
-<p><b>C1.</b> Real file sizes against the paper formula for five architectures, showing where the formula stops being accurate.</p>
-<p><b>C2.</b> A fair comparison of four compression routes at the same measured size and the same training effort.</p>
-<p><b>C3.</b> Evidence on whether equal-size models fail differently, measured against the seed floor, with the clean and corrupted rankings compared directly.</p>
-<p><b>C4.</b> The P49 Pareto table, including whether a smaller file is a faster model on a normal CPU.</p>
-<p><b>C5.</b> A repository where one command rebuilds every number, with every model file and per-image result included.</p>
+<p><b>C1.</b> Real file sizes against the formula for five networks, showing where the formula stops being accurate.</p>
+<p><b>C2.</b> A fair comparison of four compression routes at the same real size and the same training effort.</p>
+<p><b>C3.</b> Evidence on whether equal-size models fail on different photos, measured against the seed floor, and whether the clean-photo ranking survives on damaged photos.</p>
+<p><b>C4.</b> The P49 Pareto table, including whether a smaller file is also a faster model on a normal CPU.</p>
+<p><b>C5.</b> A repository where one command rebuilds every number, with every model file and per-photo result included.</p>
 
 <h2>12 Key References</h2>
 <ol class="refs">
 <li>1. Touvron H. et al. <i>Training Data-Efficient Image Transformers &amp; Distillation through Attention (DeiT).</i> ICML 2021. arXiv:2012.12877. (The source model.)</li>
-<li>2. Kuzmin A. et al. <i>Pruning vs Quantization: Which is Better?</i> NeurIPS 2023. arXiv:2307.02973. (Closest comparison; source of the equal-effort control. Start here.)</li>
+<li>2. Kuzmin A. et al. <i>Pruning vs Quantization: Which is Better?</i> NeurIPS 2023. arXiv:2307.02973. (Closest comparison; source of the equal-effort control.)</li>
 <li>3. Hendrycks D., Dietterich T. <i>Benchmarking Neural Network Robustness to Common Corruptions and Perturbations.</i> ICLR 2019. arXiv:1903.12261. (Defines ImageNet-C.)</li>
-<li>4. Hooker S. et al. <i>What Do Compressed Deep Neural Networks Forget?</i> arXiv:1911.05248, 2019. (Compression forgets particular images.)</li>
-<li>5. Miller J. et al. <i>Accuracy on the Line.</i> ICML 2021. arXiv:2107.04649. (The clean-to-corrupted trend used for O7.)</li>
+<li>4. Hooker S. et al. <i>What Do Compressed Deep Neural Networks Forget?</i> arXiv:1911.05248, 2019.</li>
+<li>5. Miller J. et al. <i>Accuracy on the Line.</i> ICML 2021. arXiv:2107.04649. (The clean-to-damaged trend used for O7.)</li>
 <li>6. Guo C. et al. <i>On Calibration of Modern Neural Networks.</i> ICML 2017. arXiv:1706.04599. (Temperature scaling.)</li>
 <li>7. Wu K. et al. <i>TinyViT: Fast Pretraining Distillation for Small Vision Transformers.</i> ECCV 2022. arXiv:2207.10666. (Distillation reference named in P49.)</li>
-<li>8. Ruciński S. et al. <i>FTerViT: Fully Ternary Vision Transformer.</i> arXiv:2605.21171, 2026. (Upper reference for ternary DeiT-Small.)</li>
-<li>9. Li F. et al. <i>Ternary Weight Networks.</i> arXiv:1605.04711, 2016. (The ternary quantiser.)</li>
-<li>10. Ranjan N., Savakis A. <i>Mix-QViT.</i> arXiv:2501.06357, 2025. (A formula size, rebuilt in Section 4.)</li>
-<li>11. Kim M. et al. <i>LampQ: Layer-wise Mixed Precision Quantization for Vision Transformers.</i> AAAI 2026. arXiv:2511.10004. (Budgets in average bits.)</li>
+<li>8. Ruciński S. et al. <i>FTerViT: Fully Ternary Vision Transformer.</i> arXiv:2605.21171, 2026.</li>
+<li>9. Li F. et al. <i>Ternary Weight Networks.</i> arXiv:1605.04711, 2016.</li>
+<li>10. Ranjan N., Savakis A. <i>Mix-QViT.</i> arXiv:2501.06357, 2025.</li>
+<li>11. Kim M. et al. <i>LampQ: Layer-wise Mixed Precision Quantization for Vision Transformers.</i> AAAI 2026. arXiv:2511.10004.</li>
 <li>12. Dettmers T. et al. <i>SpQR.</i> arXiv:2306.03078, 2023. (Counts the extra bytes, on the language-model side.)</li>
 </ol>
 <h3>Code and tooling</h3>
 <ul class="small">
 <li>This project: github.com/manankapoor23/vit-compression (private, shared with the instructor)</li>
 <li>Pretrained models: timm, github.com/huggingface/pytorch-image-models (DeiT-Small and DeiT-Tiny weights)</li>
-<li>Data: ImageNet-1k in WebDataset shards (timm/imagenet-1k-wds); corruptions from the imagecorruptions package</li>
+<li>Data: ImageNet-1k in WebDataset files (timm/imagenet-1k-wds); damage from the imagecorruptions package</li>
 <li>Python: torch, numpy, scipy, matplotlib</li>
 </ul>
 </body></html>
