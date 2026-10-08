@@ -60,9 +60,9 @@ ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
 <table>
 <tr><th style="width:11%">Objective</th><th>Why it is not already answered in the literature</th></tr>
 <tr><td>O1</td><td>Language-model papers count the extra bytes (SpQR, 2023). The vision papers I read set budgets in average bits per weight, a fair convention for their per-channel scales; none measures where it fails across group sizes and model sizes.</td></tr>
-<tr><td>O2</td><td>Kuzmin et al. (NeurIPS 2023) compare two methods at a size computed on paper, use unstructured pruning only, and list combined methods as future work.</td></tr>
-<tr><td>O3</td><td>Robustness studies compare one compressed model with its original and report one average over all corruptions. Method against method, at equal size, per corruption, is not reported.</td></tr>
-<tr><td>O4</td><td>Studies of which images a compressed model gets wrong (Hooker et al.) do not measure how much plain seed-to-seed noise produces on its own.</td></tr>
+<tr><td>O2</td><td>Kuzmin et al. (NeurIPS 2023) compare two methods at a theoretical size (no storage cost assumed for the pruning mask), use unstructured magnitude pruning, and test combining them only briefly, leaving it as future work.</td></tr>
+<tr><td>O3</td><td>Robustness studies compare compressed models with their uncompressed original; Hooker et al. do this per corruption, for pruning. Different methods compared against each other at the same measured size, per corruption, I could not find.</td></tr>
+<tr><td>O4</td><td>Hooker et al. control seed noise with populations of 30 trained models, but compare compressed with uncompressed models, not different compression methods with each other.</td></tr>
 <tr><td>O5</td><td>Required by P49. Papers report size and accuracy, rarely CPU latency for the same files.</td></tr>
 <tr><td>O6–O7</td><td>Calibration (Guo et al., 2017) and the clean-to-corrupted trend (Miller et al., 2021) are known, but are not compared across compression methods at equal size.</td></tr>
 </table>
@@ -101,13 +101,13 @@ ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
 
 <h2>5 Methods</h2>
 <h3>5.1 What the system outputs</h3>
-<p>For each of the 12 route models and 5 ablation models, the pipeline outputs: a model file whose size is read from disk; a right/wrong answer and a confidence for each of the 50,000 clean and 70,000 corrupted images; and a CPU latency. Every comparison in this study is built from those per-image answers, so two models can be compared on exactly the same images.</p>
+<p>For each of the 12 route models and 5 ablation models, the pipeline outputs: a model file whose size is read from disk; a right/wrong answer for each of the 50,000 clean and 70,000 corrupted images, with each model's accuracy, mean confidence and calibration error; and, per network, a CPU latency. Every comparison in this study is built from those per-image answers, so two models can be compared on exactly the same images.</p>
 <h3>5.2 Routes to be compared</h3>
 <table>
 <tr><th style="width:5%">#</th><th style="width:30%">Route</th><th style="width:21%">Setting searched</th><th>Why it is included</th></tr>
 <tr><td>A</td><td>3-bit: every weight rounded to one of 8 values</td><td>Group size (36 weights per scale)</td><td>Plain quantisation, the simplest way under 10 MB. The reference route.</td></tr>
 <tr><td>B</td><td>Ternary: every weight −1, 0 or +1, five packed per byte</td><td>Sensitive layers kept at 8 bits (15)</td><td>The most extreme rounding; popular because it needs only additions.</td></tr>
-<tr><td>C</td><td>4-bit + structured pruning of whole channels</td><td>Share of channels pruned (24.4%)</td><td>Combines quantisation and pruning; needed because 4-bit alone is 12.42 MB.</td></tr>
+<tr><td>C</td><td>4-bit + structured pruning of whole channels</td><td>MLP channels pruned (374 of 1,536, 24.3%)</td><td>Combines quantisation and pruning; needed because 4-bit alone is 12.42 MB.</td></tr>
 <tr><td>D</td><td>Distil into DeiT-Tiny, then 8-bit</td><td>Layers kept at 16 bits (38)</td><td>Combines distillation and quantisation; the only route that changes the network.</td></tr>
 </table>
 <h3>5.3 The size model and the comparison</h3>
@@ -221,7 +221,7 @@ ul { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 0.8mm; }
 <p>• Only the weights are compressed, not the activations (the numbers computed while the model runs), so these accuracies must not be compared with papers that do both.</p>
 <p>• Fine-tuning used about 20% of ImageNet for 3000 steps. Nothing had finished improving: ternary was still gaining faster than 3-bit, so the ranking belongs to this budget.</p>
 <p>• ImageNet-C is regenerated, so numbers do not match published ImageNet-C scores. Every route sees identical corruptions, so comparisons between routes are fair.</p>
-<p>• Ternary sits 4–5 points below the trend line on noise in all three seeds, but this does not pass a Bonferroni-strict test, so it is reported as consistent, not proven.</p>
+<p>• Ternary sits 4–5 points below the trend line on noise in all three seeds, but this does not pass a Bonferroni-strict test, so it is reported as consistent, not proven. Miller et al. also note that Gaussian noise is a shift where the trend line often breaks down, so the O7 test rests on a trend that may not hold for noise.</p>
 
 <h2>11 Expected Contributions</h2>
 <p><b>C1.</b> Real file sizes against the paper formula for five architectures, showing where the formula stops being accurate.</p>
