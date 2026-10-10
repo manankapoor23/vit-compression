@@ -32,6 +32,20 @@ Accuracy is the mean of 3 seeds. CPU time: fp32, 4 threads, batch 1, median of 5
 
 Every number and how it was checked: [`results.md`](results.md).
 
+## Notebooks
+
+Each notebook runs the real code on the saved evidence and is stored with its outputs, so it can be read on
+GitHub without running anything. To re-run: `.venv/bin/pip install nbclient ipykernel`, then open in Jupyter.
+
+| Notebook | What it shows |
+|---|---|
+| [`01_file_size`](notebooks/01_file_size.ipynb) | Formula vs real file size; every size rebuilt from network shapes (5 networks) |
+| [`02_the_four_routes`](notebooks/02_the_four_routes.ipynb) | Quantisation on real numbers; the four route files; decoding them back into models |
+| [`03_results`](notebooks/03_results.ipynb) | Main table; seed floor vs route disagreement; the clean/damaged ranking flip; damage families |
+| [`04_calibration_and_trend`](notebooks/04_calibration_and_trend.ipynb) | Calibration before/after temperature scaling; the ternary trend-line test |
+| [`05_cpu_latency`](notebooks/05_cpu_latency.ipynb) | CPU time per photo on Apple M2 and Intel; is a smaller file faster? |
+| [`06_how_the_models_were_trained`](notebooks/06_how_the_models_were_trained.ipynb) | Training recipe, training curves, the Kaggle re-check (99.71% match) |
+
 ## Layout
 
 ```
