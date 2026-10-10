@@ -61,6 +61,7 @@ src/
   offline_analysis.py   seed floor, per-corruption, calibration
   decode_bin.py         load a .bin back into a model
   rescore.py            re-score every model from its .bin (Kaggle T4)
+  o7_trend.py           the ternary trend-line test (O7)
   cpu_latency.py        CPU latency per route
   main_table.py         the result tables above
 evidence/
