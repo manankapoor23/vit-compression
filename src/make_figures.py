@@ -24,6 +24,7 @@ NAME = {"A": "A  3-bit", "B": "B  ternary", "C": "C  4-bit + prune", "D": "D  di
 
 def save(fig, name):
     fig.savefig(f"{OUT}/{name}.svg", bbox_inches="tight")
+    os.makedirs(f"{OUT}/pdf", exist_ok=True); fig.savefig(f"{OUT}/pdf/{name}.pdf", bbox_inches="tight")
     fig.savefig(f"{OUT}/png/{name}.png", bbox_inches="tight", dpi=110); plt.close(fig); print("wrote", name)
 
 # ---------------------------------------------------------------- data

@@ -24,8 +24,8 @@ Accuracy is the mean of 3 seeds. CPU time: fp32, 4 threads, batch 1, median of 5
 4. **The clean ranking flips.** B beats D on clean images in all 3 seeds (+0.9 to +1.1, McNemar
    p ≤ 3.3e-08); D beats B on damaged images in all 3 (+3.7 to +3.9, 95% CI ≈ [+3.2, +4.4]).
    D is a different architecture, so this is a deployment result, not a law.
-5. **A smaller file is not a faster model.** A and B run at the uncompressed model's speed; only D
-   is faster (2.2× on M2, 2.4× on x86).
+5. **A smaller file is not a faster model.** A and B run at the uncompressed model's speed; pruning (C) gains ~10%;
+   only D is much faster (2.2× on M2, 2.4× on x86).
 6. **The `params × bits ÷ 8` size formula** is fair for per-channel quantizers on large models
    (+2–5%) but understates real files at small group sizes and small models: +29.1% for 2-bit
    DeiT-S, +53.5% for DeiT-Tiny.
