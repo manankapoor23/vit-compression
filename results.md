@@ -679,3 +679,9 @@ Bonferroni-strict interval in 2 of 3 seeds and the plain-axis second derivation 
 reference point (74.7–76.8%), so the line is extended ~2 pts past its data.
 Claim as written: "ternary falls 4–5 points below the same-architecture line on noise in every seed;
 the gap is consistent but not statistically established after correction."
+
+**Where D's robustness comes from (2026-11-13, `src/robustness_source.py`, Kaggle re-score data).**
+Uncompressed DeiT-Tiny (timm weights) already beats ternary B by **+5.51 pts** on damaged photos (mean of
+14); route D beats B by only **+3.81**. Distillation + 8-bit *lowered* DeiT-Tiny's damaged accuracy by
+1.70 pts (clean −0.61). So D's lead over B under damage comes from the smaller network, not from
+distillation. Caveat: DeiT-Tiny 32-bit is timm's pretrained model, not fine-tuned under our 3000-step budget.
