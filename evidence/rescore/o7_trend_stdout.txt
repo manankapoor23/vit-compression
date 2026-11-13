@@ -1,0 +1,11 @@
+noise  seed 0: ternary -5.03 pts from the line, 95% range [-8.82, -1.81]  excludes 0
+noise  seed 1: ternary -4.56 pts from the line, 95% range [-9.02, -0.61]  excludes 0
+noise  seed 2: ternary -4.40 pts from the line, 95% range [-8.58, -1.14]  excludes 0
+all 14 seed 0: ternary -2.77 pts from the line, 95% range [-5.04, -0.78]  excludes 0
+all 14 seed 1: ternary -2.30 pts from the line, 95% range [-4.88, -0.13]  excludes 0
+all 14 seed 2: ternary -2.84 pts from the line, 95% range [-4.95, -0.95]  excludes 0
+
+Second check on noise: 98.3% range (Bonferroni, 3 seeds), probit axes and plain axes
+seed 0: probit 98.3% [-9.47, -0.54]  |  plain axes -4.70, 98.3% [-9.26, +0.70]
+seed 1: probit 98.3% [-9.68, +0.79]  |  plain axes -4.13, 98.3% [-9.65, +1.97]
+seed 2: probit 98.3% [-9.27, +0.42]  |  plain axes -4.04, 98.3% [-9.15, +1.63]
