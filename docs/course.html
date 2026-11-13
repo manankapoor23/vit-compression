@@ -89,7 +89,7 @@ figcaption { font-size: 8.4pt; color: #333; text-align: left; margin-top: 0.8mm;
 <tr><td>Smoke test</td><td>A tiny run (seconds) before every real run. It caught a library error in 30 seconds on Kaggle.</td></tr>
 <tr><td>Determinism, round-trip</td><td>Same input must give same output: the 5,000-photo and 50,000-photo runs agree bit for bit. Every model file decodes and re-encodes to identical bytes, and the decoded files reproduce the original answers.</td></tr>
 <tr><td>Two-way checks</td><td>Every file size is also computed by hand from layer shapes; every statistic is recomputed from saved per-photo results (<code>./reproduce.sh</code>, 40 seconds).</td></tr>
-<tr><td>Bugs that taught lessons</td><td>A file pattern that silently matched zero training files; a copy that was secretly the same object and cost one route 3.9 points; a size drift from rounding a number two different ways. Nine bugs in all; two were visible only because size was measured alongside accuracy.</td></tr>
+<tr><td>Bugs that taught lessons</td><td>A file pattern that silently matched zero training files; a copy that was secretly the same object and cost one route 3.9 points; a size drift from rounding a number two different ways. Ten bugs in all; two were visible only because size was measured alongside accuracy.</td></tr>
 </table>
 
 <h2>9. What it all adds up to</h2>
