@@ -1,0 +1,100 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>What We Did — The Project as a Story</title>
+<style>
+@page { size: A4; margin: 16mm 17mm 15mm 17mm; @bottom-center { content: counter(page); font: 9pt Georgia, serif; color: #555; } }
+body { font-family: Georgia, "Times New Roman", serif; font-size: 10.6pt; line-height: 1.55; color: #111; margin: 0; }
+h1 { font-size: 19pt; text-align: center; margin: 0 0 1mm; }
+.sub { text-align: center; font-style: italic; color: #333; margin: 0 0 5mm; }
+h2 { font-size: 13pt; margin: 6mm 0 1.5mm; page-break-after: avoid; }
+p { margin: 0 0 2.4mm; }
+.box { border-left: 1.2pt solid #111; padding: 0.5mm 0 0.5mm 3.5mm; margin: 2.5mm 0 3.5mm; page-break-inside: avoid; }
+.box p:last-child { margin: 0; }
+table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 3mm; font-size: 9.6pt; page-break-inside: avoid; }
+td, th { border: 0.6pt solid #888; padding: 1.2mm 2mm; text-align: left; vertical-align: top; }
+th { background: #eee; }
+figure { margin: 2mm 0 3.5mm; text-align: center; page-break-inside: avoid; }
+figure img { max-width: 100%; }
+figcaption { font-size: 9pt; color: #333; text-align: left; margin-top: 1mm; }
+ul, ol { margin: 0 0 2.5mm; padding-left: 5mm; } li { margin-bottom: 1mm; }
+</style></head><body>
+
+<h1>What We Did</h1>
+<div class="sub">The whole project as a story, in plain words. Read it once, top to bottom, in about 25 minutes.</div>
+
+<h2>1. The problem we were given</h2>
+<p>Problem P49 said: take an image-recognition model called a Vision Transformer and make it small enough to fit on a phone, under 10 MB.</p>
+<p>We started with a model called <b>DeiT-Small</b>. You show it a photo, and it says which of 1,000 things is in it (a dog, a car, a cup...). It gets the right answer 79.72% of the time on the standard test photos. Inside, the model is just a list of 22 million numbers (called <b>weights</b>) that it learned during training. Each number is stored in 32 bits, so the file is 88 MB. To get under 10 MB, we have to fit each number into about 3.6 bits instead of 32. That is roughly nine times smaller.</p>
+
+<h2>2. The three ways to shrink a model</h2>
+<p><b>Rounding (quantisation).</b> Instead of storing 0.1234567, store a rough version: one of only 8 allowed values (3 bits) or 16 (4 bits). To turn the rough values back into real numbers, the file also keeps a few helper numbers called <b>scales</b>. It is like describing every house on a street as "small, medium or large" plus one note saying how big "large" is on this street.</p>
+<p><b>Cutting (pruning).</b> Some parts of the model barely matter. Delete whole rows of numbers that contribute least, and the model gets smaller.</p>
+<p><b>Copying (distillation).</b> Take a model that is already small (<b>DeiT-Tiny</b>, about a quarter of the size) and train it to give the same answers as the big one, like a student copying a teacher's notes.</p>
+<figure><img src="../proposal/figs/png/fig_techniques.png" style="width:92%"><figcaption>The three ideas. The numbers on the left are real: 0.12, −0.40 and 0.05 become 1, −3 and 0, times one scale of 0.133.</figcaption></figure>
+
+<h2>3. The question we asked</h2>
+<p>Lots of papers compare these methods. They usually compare two things: how accurate the model is on normal, clean photos, and how big the file is, worked out with a formula. We noticed both of these can mislead:</p>
+<ul>
+<li>The size formula forgets the helper numbers (scales) and the layers that are left un-shrunk. So the real file can be bigger than the paper says.</li>
+<li>Two models with the same accuracy can still get <i>different</i> photos wrong, and one can fall apart when photos are blurry or noisy while the other copes.</li>
+</ul>
+<div class="box"><p><b>So our question was:</b> if we shrink the same model four different ways, all to the same real file size, with the same amount of training, do the four models make the same mistakes? And does the one that is best on clean photos stay best on damaged photos?</p></div>
+
+<h2>4. Step 1 — we measured real file sizes</h2>
+<p>Before building anything, we checked the size formula. We wrote compressed models to disk and measured the real files. At 2 bits, the real DeiT-Small file is <b>29% bigger</b> than the formula says; for the smaller DeiT-Tiny, <b>53% bigger</b>. The smaller the model, the worse the formula gets, because the parts that cannot be shrunk are a bigger share of a small model.</p>
+<p>This step also told us something practical: a 4-bit DeiT-Small file is really 12.42 MB, which is over the limit. So "just use 4 bits" does not work; a 4-bit route must also cut something.</p>
+<p>To be sure our sizes were right, we checked each one a second way: we predicted every file size from the model's shape on paper, and compared it with the measured file. For all 80 files we tested, the only difference was a small label at the start of each file (the header).</p>
+<figure><img src="../proposal/figs/png/fig1_size_gap.png" style="width:90%"><figcaption>White bars: what the formula says. Dark bars: the real file.</figcaption></figure>
+
+<h2>5. Step 2 — we built four "routes" to the same size</h2>
+<p>A <b>route</b> is one complete recipe for shrinking the model. We built four:</p>
+<table>
+<tr><th style="width:8%">Route</th><th>What it does</th><th style="width:16%">File size</th></tr>
+<tr><td>A</td><td>Round every number to 3 bits (8 allowed values)</td><td>9.718 MB</td></tr>
+<tr><td>B</td><td>Round every number to just −1, 0 or +1 (called <b>ternary</b>), and squeeze five of them into one byte</td><td>9.785 MB</td></tr>
+<tr><td>C</td><td>Round to 4 bits <i>and</i> cut 374 of the 1,536 rows in each block's middle layer</td><td>9.796 MB</td></tr>
+<tr><td>D</td><td>Train the small DeiT-Tiny to copy DeiT-Small, then round it to 8 bits</td><td>9.765 MB</td></tr>
+</table>
+<p>To make them the same size, each route has one dial. For route A, the dial is how many numbers share one helper scale. The computer turned the dial, wrote the real file, measured it, and kept adjusting until the file landed just under the target, a bit like tuning a radio. We never looked at accuracy while doing this, only at file size. The four files ended up within 0.8% of each other.</p>
+
+<h2>6. Step 3 — we retrained each model, three times</h2>
+<p>Rounding or cutting a model damages it a little. So after shrinking, each model was retrained briefly, called <b>fine-tuning</b>, so it could adjust. Every route got exactly the same amount: 3,000 training steps with the same settings. That way no model could win just because it was trained longer.</p>
+<p>One trick here: the model trains while "seeing" its rounded numbers, but it secretly keeps the precise numbers underneath and keeps improving them. This is called <b>quantisation-aware training</b>. The code that does it is <code>FakeQuant</code> in <code>src/train_routes.py</code>.</p>
+<p>We trained each route <b>three times</b>, each with a different <b>random seed</b>. Training involves random choices (like the order the photos are shown in), and the seed fixes those choices. Why three times? See step 5.</p>
+
+<h2>7. Step 4 — we tested them on clean and damaged photos</h2>
+<p>We tested every model on the 50,000 standard test photos. Then we made damaged copies of 5,000 of them using a standard set called <b>ImageNet-C</b>: 14 kinds of damage like noise (grainy photos), blur, fog, snow and pixelation. Every model saw exactly the same photos and exactly the same damage. For every model, we saved whether it got each single photo right or wrong.</p>
+
+<h2>8. Step 5 — we measured luck</h2>
+<p>Here is the subtle part. Even the <i>same</i> route, trained twice with different seeds, gives two slightly different models, and they disagree on some photos. So if two different routes disagree on some photos, maybe that is just luck, not the route.</p>
+<p>So we measured luck first. Two runs of the 3-bit route disagree on 8.5% of the photos. We call this the <b>seed floor</b>: the amount of disagreement you get from luck alone. Then we compared different routes: 3-bit and ternary disagree on 12.3%, against a combined seed floor of 9.0%, which is 1.4 times higher. For every pair of routes, the disagreement was 1.2 to 2.0 times the seed floor. So the differences are real, not luck.</p>
+<figure><img src="../proposal/figs/png/fig5_routes_vs_seeds.png" style="width:82%"><figcaption>White: two runs of the same route (luck). Dark: two different routes. Dark is always taller.</figcaption></figure>
+
+<h2>9. What we found</h2>
+<p><b>Finding 1: same size does not mean same model.</b> The four models, all about 9.8 MB, make different mistakes, beyond what luck explains.</p>
+<p><b>Finding 2: the winner on clean photos loses on damaged photos.</b> On clean photos, the ternary model (B) beats the distilled model (D) by about 1 point. On damaged photos, D beats B by about 3.8 points. This happened in all three training runs. Ternary is hit especially hard by noise.</p>
+<figure><img src="../proposal/figs/png/fig3_two_rankings.png" style="width:55%"><figcaption>B and D swap places between clean and damaged photos.</figcaption></figure>
+<p><b>Why does D cope better?</b> We checked, and it is not because of the copying (distillation). The small DeiT-Tiny, before any compression, already beats ternary on damaged photos by 5.5 points. Copying and rounding actually made it 1.7 points worse. So D is robust because it is a different, smaller network. In plain words: if your camera will see noisy photos, picking a model by its clean-photo score would pick the wrong one.</p>
+<p><b>Finding 3: smaller file does not mean faster.</b> We timed each model on a normal computer processor. The 3-bit and ternary models are nine times smaller but run at the same speed as the original, because computers have no fast way to do maths directly on 3-bit or ternary numbers, so the numbers get expanded back when the model loads. Cutting rows (C) made it about 10% faster. Only the small DeiT-Tiny (D) was much faster: about 2.2 to 2.4 times.</p>
+<p><b>Finding 4: honest confidence.</b> A model also says how sure it is. Model D was the worst at this before a simple one-number correction, and the best after it. <b>Finding 5</b>, whether ternary is <i>specially</i> bad with noise or just a weaker model overall, came out "probably, but not proven": it passed the test we set in advance, but failed a stricter one, so we report it as not proven.</p>
+<p><b>Our final model</b> for P49 is route A: 9.718 MB, 76.50% accuracy, which is 3.22 points below the original's 79.72%.</p>
+
+<h2>10. How we made sure it is all true</h2>
+<ul>
+<li><b>Every model file was read back and re-saved</b>: all 21 came out byte-for-byte identical, so the files really are the models.</li>
+<li><b>Every model was re-tested from its file on a different computer</b> (a free Kaggle GPU): 99.71% of the 600,000 right/wrong answers matched the first test. The tiny difference comes from rounding on different hardware.</li>
+<li><b>We wrote down four predictions before looking at the results.</b> One was wrong (we expected luck to cause 3–6% disagreement; it was 6.3–9.6%). We kept it in the report as wrong.</li>
+<li><b>One command, <code>./reproduce.sh</code>, rebuilds every number</b> from the saved results in about 90 seconds on a laptop.</li>
+</ul>
+
+<h2>11. What went wrong along the way</h2>
+<p>We found and fixed ten bugs. Two examples. A file pattern quietly matched zero training files without any error, so a model would have "trained" on nothing. A copy of the model's numbers was secretly the same object as the original, so a later step overwrote it and cost the ternary route 3.9 points until we caught it. Two of the ten were only noticed because we measured file size alongside accuracy. We also withdrew three claims after checking them properly, for example that published papers get model sizes wrong in general. They don't; the formula is fine for how they store scales, and only breaks under a strict size limit like ours.</p>
+
+<h2>12. What is not done, and why that is okay</h2>
+<ul>
+<li>No single model uses all three methods at once. Each route uses at most two, so each comparison changes one thing at a time. A fifth model using all three is the next step.</li>
+<li>Training was short (3,000 steps on 20% of the training photos), so every model is below its best possible accuracy. That is fine, because we only compare routes against each other, all trained the same way.</li>
+<li>We used the full ImageNet (1,000 classes) instead of the smaller ImageNet-100 that P49 suggests. It is harder, and it contains ImageNet-100.</li>
+</ul>
+
+<div class="box"><p><b>The whole project in one breath:</b> we measured real file sizes, built four different 9.8 MB versions of the same model with equal training, measured how much luck alone changes a model, and showed that the four versions fail on different photos, that the best one on clean photos is the worst choice for noisy photos, and that a smaller file is not automatically faster.</p></div>
+</body></html>

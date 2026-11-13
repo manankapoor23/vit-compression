@@ -10,7 +10,7 @@ For whoever (human or AI) continues this project. Final submission deadline: **1
   rebuild with `cd report && tectonic -X compile main.tex`. Figures come from `src/make_figures.py`
   (writes `proposal/figs/{pdf,png}/`).
 - Notebooks: `notebooks/01–06`, executed, print the real source from `src/`.
-- Viva pack: `docs/VIVA.md` (30 questions with file:line pointers). Learning doc: `docs/Project_Course.pdf`.
+- Viva pack: `docs/VIVA.md` (30 questions with file:line pointers). Learning docs: `docs/What_We_Did.pdf` (the project as a story) and `docs/Project_Course.pdf` (concepts).
 
 ## Left for the author
 1. **AI declaration** — last line of `report/main.tex` says `[to be completed by the author]`. Fill it
