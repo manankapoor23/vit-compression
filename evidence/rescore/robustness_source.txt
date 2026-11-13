@@ -1,0 +1,11 @@
+model               clean  damaged   drop    noise     blur  weather  digital
+DeiT-S 32-bit       79.72    62.64  17.08    65.49    52.29    68.09    62.80
+DeiT-Tiny 32-bit    72.02    49.86  22.16    50.40    40.06    56.48    50.19
+D distilled+8bit    71.41    48.16  23.25    46.82    39.58    52.95    50.79
+B ternary           72.43    44.35  28.08    36.32    37.55    47.48    52.34
+A 3-bit             76.50    55.04  21.46    55.50    45.43    58.40    58.55
+
+uncompressed DeiT-Tiny vs B on damaged photos: +5.51 pts
+route D vs B on damaged photos:                +3.81 pts
+distillation + 8-bit changed DeiT-Tiny by:     -1.70 pts damaged, -0.61 pts clean
+-> D's lead over B on damaged photos comes from the smaller network, not from distillation.
