@@ -223,3 +223,32 @@ ar(52, 54); rbox(54.5, 6, 12.5, 8, "MLP: each token\nthinks alone\n(64% of weigh
 ar(69, 73); rbox(73.5, 6, 11, 8, "class token\nsummarises\nthe image")
 ar(85, 88); rbox(88.5, 6, 11, 8, "1,000 scores\n-> top guess\n\"tiger\"", "#ddd")
 save(fig, "fig_vit")
+
+# ---------------------------------------------------------------- fig 8: calibration + the O7 trend line
+from scipy.stats import norm as _norm
+RS = json.load(open("evidence/rescore/rescore.json"))
+TEMP, RES = RS["temperature"], RS["results"]
+fig, (a1, a2) = plt.subplots(1, 2, figsize=(7.4, 2.9), gridspec_kw={"width_ratios": [1, 1.25]})
+xs = np.arange(4)
+before = [np.mean([TEMP[f"{r}-s{s}"]["ece_odd_before"] for s in (0, 1, 2)]) for r in "ABCD"]
+after = [np.mean([TEMP[f"{r}-s{s}"]["ece_odd_after"] for s in (0, 1, 2)]) for r in "ABCD"]
+a1.bar(xs - 0.19, before, 0.38, color="white", edgecolor="#222", lw=0.7, label="before")
+a1.bar(xs + 0.19, after, 0.38, color="#555", edgecolor="#222", lw=0.7, label="after temperature scaling")
+a1.set_xticks(xs); a1.set_xticklabels(["A 3-bit", "B ternary", "C 4-bit+prune", "D distilled"], fontsize=7)
+a1.set_ylabel("calibration error, ECE (%)"); a1.legend(frameon=False, fontsize=7)
+a1.spines[["top", "right"]].set_visible(False)
+NOISE = ["gaussian_noise_s3", "shot_noise_s3", "impulse_noise_s3"]
+cl = lambda k: 100 * np.mean(RES[k]["clean"]["correct"][:5000])
+nz = lambda k: 100 * np.mean([np.mean(RES[k][c]["correct"]) for c in NOISE])
+ref = [f"A-g{g}-s0" for g in (32, 64, 128, 256, 512)] + ["A-s0", "C-s0"]
+P = lambda a: _norm.ppf(np.clip(np.asarray(a) / 100, 1e-4, 1 - 1e-4))
+x, y = [cl(k) for k in ref], [nz(k) for k in ref]
+slope, icept = np.polyfit(P(x), P(y), 1)
+grid = np.linspace(71.5, 77.5, 50)
+a2.plot(grid, 100 * _norm.cdf(icept + slope * P(grid)), color="#999", lw=0.9, ls="--", label="trend of 7 same-shape models")
+a2.scatter(x, y, s=18, color="#222", zorder=3)
+a2.scatter([cl("B-s0")], [nz("B-s0")], s=40, color="white", edgecolor="#222", lw=1, zorder=4, label="B ternary")
+a2.annotate(f"ternary: {-json.load(open('evidence/rescore/o6_line.json'))['noise_s0']['residual']:.1f} pts\nbelow the line", (cl("B-s0"), nz("B-s0")), xytext=(8, -4), textcoords="offset points", fontsize=7)
+a2.set_xlabel("clean accuracy (%)"); a2.set_ylabel("accuracy under noise (%)"); a2.legend(frameon=False, fontsize=7, loc="upper left")
+a2.spines[["top", "right"]].set_visible(False)
+fig.tight_layout(); save(fig, "fig8_calibration_trend")

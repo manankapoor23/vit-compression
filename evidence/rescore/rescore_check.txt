@@ -1,0 +1,1 @@
+re-score on Tesla T4 (torch.float16): 1728 of 600,000 per-photo answers changed -> 99.71% match
