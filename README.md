@@ -30,7 +30,7 @@ Accuracy is the mean of 3 seeds. CPU time: fp32, 4 threads, batch 1, median of 5
    (+2–5%) but understates real files at small group sizes and small models: +29.1% for 2-bit
    DeiT-S, +53.5% for DeiT-Tiny.
 
-Every number and how it was checked: [`results.md`](results.md).
+**Report (CVPR format): [`report/main.pdf`](report/main.pdf).** Every number and how it was checked: [`results.md`](results.md).
 
 ## Notebooks
 
@@ -50,7 +50,9 @@ GitHub without running anything. To re-run: `.venv/bin/pip install nbclient ipyk
 
 ```
 results.md         every number, its source, and how it was checked
-reproduce.sh       rebuilds the statistics, size audit and main tables (~45 s, no GPU)
+reproduce.sh       re-derives and checks every statistic and table (6 checks, ~2 min, no GPU)
+report/            CVPR-format report (main.tex, main.pdf; build: tectonic -X compile main.tex)
+notebooks/         six executed notebooks that print the real source code
 proposal/          UCS532 proposal (HTML source + PDF)
 src/
   phase1_audit.py       real file sizes vs the formula
@@ -62,6 +64,9 @@ src/
   decode_bin.py         load a .bin back into a model
   rescore.py            re-score every model from its .bin (Kaggle T4)
   o7_trend.py           the ternary trend-line test (O7)
+  rescore_check.py      do the model files reproduce the original run (99.71%)
+  robustness_source.py  where route D's robustness comes from
+  make_figures.py       draws every figure from saved results
   cpu_latency.py        CPU latency per route
   main_table.py         the result tables above
 evidence/
