@@ -40,6 +40,8 @@ This project fixes the two things a deployment pays for, measured bytes and trai
 
 \textbf{Comparing compression methods.} Kuzmin \etal~\cite{kuzmin2023pruning} compare pruning and quantisation under equal fine-tuning at a theoretical size, with unstructured pruning, and test combining them only briefly. I borrow their equal-effort control.
 
+\textbf{ViT pruning and quantisation.} Token pruning such as DynamicViT~\cite{rao2021dynamicvit} drops tokens at run time and speeds up inference, but does not shrink the stored weights, so it cannot meet a file-size limit; structured width pruning of ViTs~\cite{yu2022width} does, and route C uses it on MLP channels. Post-training ViT quantisers such as PTQ4ViT~\cite{yuan2022ptq4vit} and RepQ-ViT~\cite{li2023repqvit} quantise weights \emph{and} activations (\eg W4/A4), a harder problem than the weight-only setting here. PyTorch's \texttt{torch.ao} dynamic 8-bit quantisation, named in P49, is used for the CPU timing; it has no 3-bit or ternary format and no byte-exact file, so the routes use their own quantiser.
+
 \textbf{What compression breaks.} Hooker \etal~\cite{hooker2019forget} show compression concentrates errors on particular images and amplifies sensitivity to ImageNet-C~\cite{hendrycks2019benchmarking}, comparing compressed with uncompressed models. Miller \etal~\cite{miller2021line} show that accuracy under shift usually follows a linear trend in clean accuracy on probit axes, with noise among the exceptions. Guo \etal~\cite{guo2017calibration} introduce temperature scaling. Ternary weights follow TWN~\cite{li2016ternary}; TinyViT~\cite{wu2022tinyvit} is the distillation reference named in P49.
 
 \section{The Size Formula Versus the Real File}
@@ -62,17 +64,18 @@ For DeiT-Small at group 256 the real file exceeds the formula by 4.5\% at 8 bits
 
 \section{Method}
 \label{sec:method}
-\textbf{Routes.} A \emph{route} is one recipe: compress, then fine-tune. Each has one setting, found by binary search on the written file until it lands just under the target; accuracy is never used. \Cref{tab:main} lists the result.
+\textbf{Routes.} A \emph{route} is one recipe: compress, then fine-tune. Every route starts from pretrained timm weights. Each has one setting, found by binary search on the written file until it lands just under the target; accuracy is never used. \Cref{tab:main} lists the result.
 \begin{itemize}\setlength\itemsep{0pt}
 \item \textbf{A, 3-bit}: symmetric group-wise rounding, 36 weights per scale.
 \item \textbf{B, ternary}: weights in $\{-1,0,+1\}$ with one scale per row (TWN threshold $0.7\,\mathbb{E}|w|$), five weights per byte ($3^5=243\le256$); the 15 most sensitive layers (by weight variance) stay at 8 bits.
 \item \textbf{C, 4-bit + structured pruning}: the 374 weakest of 1,536 MLP channels per block removed (24.3\%), then 4-bit.
-\item \textbf{D, distillation}: DeiT-Tiny distilled from DeiT-Small (temperature 2, equal weight with the label loss), stored at 8 bits with 38 layers kept at 16 bits.
+\item \textbf{D, distillation}: pretrained DeiT-Tiny further distilled from DeiT-Small (temperature 2, equal weight with the label loss), stored at 8 bits with 38 layers kept at 16 bits.
 \end{itemize}
+The routes are kept separate rather than stacked, so that each comparison at equal size changes one method at a time; a model combining all three is left as an extension.
 
 \textbf{Fine-tuning (identical for all routes).} 3000 steps, batch 256, AdamW, learning rate $10^{-4}$ with cosine decay, weight decay 0.05, label smoothing 0.1, on 200 of 1,024 ImageNet training shards ($\approx$20\%). Rounding is simulated in the forward pass with a straight-through estimator, so full-precision weights keep learning. The exported model is always the step-3000 model; validation accuracy is only logged. Three seeds per route.
 
-\textbf{Evaluation.} Clean top-1 on all 50,000 ImageNet validation images; 14 of the 15 ImageNet-C corruptions~\cite{hendrycks2019benchmarking} at severity 3 on the first 5,000 images (glass blur excluded: 865\,s per 1,000 images, about 20$\times$ the others). Every model saw identical images and damage, and every right/wrong answer is stored per image.
+\textbf{Evaluation.} Clean top-1 on all 50,000 ImageNet validation images; 14 of the 15 ImageNet-C corruptions~\cite{hendrycks2019benchmarking} at severity 3 on the first 5,000 images (glass blur excluded: 865\,s per 1,000 images, about 20$\times$ the others). Every model saw identical images and damage, and every right/wrong answer is stored per image. Two evaluation runs are used: the original run (H100, one cached damage set) gives the seed floor, the per-corruption and per-family results and \cref{fig:seeds,fig:rank}; the Kaggle re-score of the model files (damage regenerated with fixed seeds) gives \cref{tab:main}, the B--D tests, calibration, the trend line and the robustness-source analysis. Damaged accuracies therefore differ slightly between the two (\eg B: 44.24 vs 44.35).
 
 \textbf{Statistics.} Disagreement between models $x,y$ is the share of images where exactly one is right, $d(x,y)=\frac1n\sum_i \mathbb{1}[c_x(i)\neq c_y(i)]$. The \emph{seed floor} is $d$ between two seeds of one route. Paired comparisons use McNemar's exact test and image bootstrap (10,000 resamples) with Bonferroni correction; the 5,000 damaged images, not 70,000 image-corruption pairs, are the unit. Seeds give means, ranges and sign agreement only. Four predictions were written into the analysis script before it ran (\cref{sec:limits}).
 
@@ -94,7 +97,7 @@ C & 4-bit + pruning & 9.796 & 75.70 & 75.66--75.73 & 4.02 & 53.55 & 64.1 / 16.1 
 D & DeiT-Tiny, distilled, 8-bit & 9.765 & 71.41 & 71.24--71.54 & 8.31 & 48.16 & 29.9 / 8.0 \\
 \bottomrule
 \end{tabular}
-\caption{Main results (accuracy: mean of 3 seeds, re-scored from the model files). Damaged: mean over 14 corruptions at severity 3 on 5,000 images. CPU: 32-bit kernels, 4 threads, batch 1, median of 50 runs. The published DeiT-Small accuracy is 79.8\%.}
+\caption{Main results (accuracy: mean of 3 seeds, re-scored from the model files). Damaged: mean over 14 corruptions at severity 3 on 5,000 images. CPU: 32-bit kernels, 4 threads, batch 1, median of 50 runs, measured per network shape; A and B run as the decoded 32-bit DeiT-Small, so their time equals the baseline's by construction (decoding time not included). The published DeiT-Small accuracy is 79.8\%.}
 \label{tab:main}
 \end{table*}
 
@@ -123,7 +126,7 @@ On clean images ternary beats the distilled model in every seed ($+1.02$, $+0.92
 \label{fig:rank}
 \end{figure}
 
-\textbf{Where D's robustness comes from.} The uncompressed DeiT-Tiny already beats ternary by $+5.51$ points on damaged images; route D beats it by $+3.81$. Distillation and 8-bit storage \emph{lowered} DeiT-Tiny's damaged accuracy by 1.70 points (clean: $-0.61$). The reversal is therefore a property of the smaller network, not of distillation. Since route D also changes the architecture, I report it as a deployment result: choosing on clean accuracy alone picks ternary, which is the wrong model for noisy inputs.
+\textbf{Where D's robustness comes from.} The uncompressed DeiT-Tiny already beats ternary by $+5.51$ points on damaged images; route D beats it by $+3.81$. Distillation and 8-bit storage \emph{lowered} DeiT-Tiny's damaged accuracy by 1.70 points (clean: $-0.61$). Route D starts from that same pretrained DeiT-Tiny, so the reversal is a property of the smaller network, not of distillation. (DeiT-Tiny's own pretraining is far longer than this study's 3000 steps, which this comparison does not control.) Since route D also changes the architecture, I report it as a deployment result: choosing on clean accuracy alone picks ternary, which is the wrong model for noisy inputs.
 
 \subsection{Calibration and the trend line}
 \label{sec:calib}
@@ -140,9 +143,41 @@ To ask whether ternary is specially weak on noise or simply weaker (\cref{fig:ca
 
 \subsection{Pareto table: a smaller file is not a faster model}
 \label{sec:latency}
-Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.11$\times$ on both machines); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). A, C and D are Pareto-optimal; B is dominated by A (same speed, 4.1 points lower). PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel, so CPU conclusions are machine-specific.
+Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.11$\times$ on both machines); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). A, C and D are Pareto-optimal (\cref{fig:pareto}); B is dominated by A (same speed, 4.1 points lower). PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel, so CPU conclusions are machine-specific.
 
-\textbf{What each stage buys.} Rebuilding route A at groups 512 to 36 raises the file from 8.59 to 9.72\,MB and clean accuracy from 74.51 to 76.51\% (damaged 50.07 to 54.90\%). For route D, swapping to DeiT-Tiny costs 7.7 points; distillation and 8-bit to 9.77\,MB cost a further 0.8 (seed 0). Intermediate stages of B and C were not saved.
+\subsection{Ablation: group size and compression stages}
+\label{sec:ablation}
+\Cref{tab:stages} shows what each step buys. Rebuilding route A with fewer weights per scale (512 down to 36) adds 1.13\,MB and raises clean accuracy by 2.0 points and damaged accuracy by 4.8; below 36 the file passes the matched size with no further clean gain. For route D, swapping to DeiT-Tiny costs 7.7 points; distillation and 8-bit storage down to 9.77\,MB cost a further 0.8. Intermediate stages of B and C were not saved.
+
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lccc}
+\toprule
+Stage (seed 0) & MB & Clean & Damaged \\
+\midrule
+DeiT-Small, 32-bit & 88.24 & 79.72 & 62.64 \\
+A: 3-bit, group 512 & 8.59 & 74.51 & 50.07 \\
+A: 3-bit, group 256 & 8.67 & 75.21 & 51.63 \\
+A: 3-bit, group 128 & 8.84 & 75.75 & 52.94 \\
+A: 3-bit, group 64 & 9.19 & 76.14 & 54.13 \\
+A: 3-bit, group 36 (submitted) & 9.72 & 76.51 & 54.90 \\
+A: 3-bit, group 32 & 9.87 & 76.51 & 54.99 \\
+\midrule
+DeiT-Tiny, 32-bit & 22.90 & 72.02 & 49.86 \\
+D: distilled, 8-bit (submitted) & 9.77 & 71.24 & 48.31 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation: what each compression stage buys and costs. Accuracy from the re-score of the model files.}
+\label{tab:stages}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{fig6_pareto}
+\caption{Pareto plot (Apple M2, 4 threads): clean accuracy against CPU time per image. A, C and D lie on the best-trade-off line; B is dominated by A.}
+\label{fig:pareto}
+\end{figure}
 
 \section{Limitations and Withdrawn Claims}
 \label{sec:limits}
@@ -153,7 +188,7 @@ Routes A and B are nine times smaller than the original but run at its speed (\c
 \section{Conclusion}
 Under a hard size limit, measured bytes, not bits per weight, are the right budget. At approximately equal measured size and equal effort, compression routes are not interchangeable: they fail on different images, beyond seed noise, and the clean ranking can reverse under damage. A deployment choice made on clean accuracy and on paper size can pick a larger, slower or less robust model than intended.
 
-\textbf{Reproducibility.} \texttt{reproduce.sh} rebuilds every statistic and table from the saved per-image results and model files on a laptop in about 90 seconds; six notebooks print the real source of every step.
+\textbf{Reproducibility.} \texttt{reproduce.sh} re-derives every statistic and table from the saved per-image results and model files and checks each against the archived outputs, on a laptop in about 2 minutes; \texttt{src/make\_figures.py} redraws every figure; six notebooks print the real source of every step. Solo project, so no team contribution statement is required.
 
 \textbf{AI-assistance declaration.} AI assistants (Claude, via Claude Code) were used for: writing and debugging the analysis, evaluation and figure code; drafting and editing the proposal and this report; and checking numbers against the evidence and literature claims against the primary papers. All AI-generated code was reviewed, run and checked against the archived outputs with \texttt{reproduce.sh}, and is understood by the author. The following components contain no AI-generated content: \textbf{[to be completed by the author]}.
 

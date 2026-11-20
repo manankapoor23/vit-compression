@@ -586,14 +586,14 @@ alongside it**, which is itself an argument for the reporting protocol.
    architecture (§1.5). Within-architecture evidence is §1.4.
 7. **14 of 15 corruptions, severity 3 only.** `glass_blur` excluded for runtime.
 8. **Corruption evaluated on 5,000 images**, clean on 50,000.
-9. **Per-image confidences were not saved**, so temperature-scaled ECE cannot be computed.
+9. ~~Per-image confidences were not saved, so temperature-scaled ECE cannot be computed.~~ **Resolved 2026-10-08:** the Kaggle re-score fits the temperature on even-numbered images and reports ECE on odd ones (Phase 4 section).
 10. **Three seeds.** Enough for sign consistency and a seed floor; not for testing seed variance.
 11. **No `.bin` file was ever decoded back and evaluated.** Accuracy comes from the training checkpoint
     with identical quantization simulated on the fly; the file is written by the same policy. They
     agree by construction (biases/norms differ only by FP16 rounding). **Update 2026-10-08:**
     `src/decode_bin.py` now decodes all 21 files and re-encodes them **byte-identically** (21/21);
-    scoring the decoded files on ImageNet is pending a GPU run (`docs/GPU_RUN.md`).
-12. **Latency on one CPU** (Apple M2). The uncompressed baseline's accuracy is published, not measured.
+    **resolved 2026-10-08:** every decoded file was re-scored on a Kaggle T4; 99.71% of 600,000 per-image answers match (`src/rescore_check.py`).
+12. ~~Latency on one CPU (Apple M2); baseline accuracy published, not measured.~~ **Resolved 2026-10-08:** latency also on Intel Xeon; DeiT-S baseline measured at 79.72% in the same pipeline.
 
 ---
 
@@ -655,7 +655,7 @@ Bonferroni bar (6 tests): p < 0.0083. All pass. Archived clean p-values were 5.1
 
 **Calibration (O5).** Temperature fitted on even images, ECE on odd. D goes from worst (~12) to best
 (~3.0) after one-number temperature scaling; A/B/C stay near 3.7–4.3. So D's calibration gap is a
-uniform overconfidence, not a deeper defect.
+uniform underconfidence on clean images (accuracy above confidence), not a deeper defect.
 
 **x86 CPU latency** (Intel Xeon @ 2.00 GHz, batch 1, median of 50, int8-dynamic, 1 thread):
 A/B 98.95 ms · C 86.91 ms · D 38.52 ms · DeiT-S FP32 119.25 ms.

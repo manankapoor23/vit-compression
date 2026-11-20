@@ -4,7 +4,7 @@ For whoever (human or AI) continues this project. Final submission deadline: **1
 
 ## Done
 - Experiments, statistics, Kaggle re-score: all complete. `./reproduce.sh` rebuilds and checks everything
-  (6 checks, ~90 s, laptop only). Every number lives in `results.md`.
+  (6 checks, ~2 min, laptop only). Every number lives in `results.md`.
 - Proposal: `proposal/UCS532_Proposal_P49.pdf` (submitted).
 - Report: `report/main.pdf`, CVPR format, 4 pages + references. Source `report/main.tex`;
   rebuild with `cd report && tectonic -X compile main.tex`. Figures come from `src/make_figures.py`
