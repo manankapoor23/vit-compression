@@ -1,4 +1,5 @@
 \documentclass[10pt,twocolumn,letterpaper]{article}
+\usepackage[T1]{fontenc}
 \usepackage[pagenumbers]{cvpr}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -17,7 +18,7 @@ UCS532 Computer Vision, Sessional Open Challenge, Problem P49}
 \maketitle
 
 \begin{abstract}
-At matched real file size and training effort, do different ways of compressing a Vision Transformer fail on the same images? I compress DeiT-Small four ways (3-bit, ternary, 4-bit with structured pruning, and distillation into DeiT-Tiny with 8-bit storage) to approximately the same \emph{measured} size (9.72--9.80\,MB, within 0.8\%) under an identical 3000-step budget, three seeds each, and measure disagreement against seed noise. Two quantisers of DeiT-Small disagree only 1.2$\times$ as often as two seeds of one route; a different quantiser family 1.4$\times$; pairs that change the network 1.8--2.0$\times$. Within DeiT-Small, the routes keep their clean ranking on all 14 corruptions (no reversal consistent across seeds in 42 paired tests per seed), while the size of the loss depends strongly on the damage type: ternary trails 3-bit by 17.7--20.2 points on noise but 5.9--6.4 on digital damage. The ranking reverses only in the cross-architecture comparison: ternary beats distilled DeiT-Tiny on clean images in all seeds ($+0.9$ to $+1.1$ points) and loses on damaged images in all seeds ($-3.7$ to $-3.9$); the uncompressed DeiT-Tiny shows the same reversal, which supports an architectural explanation. As a control, I show that the usual size formula, weights $\times$ bits $\div$ 8, understates real files by 1.5--53.5\% across five networks under the small groups a hard budget forces. The best model, 3-bit DeiT-Small at 9.718\,MB, loses 3.22 points against a 79.72\% baseline, and only the distilled route runs much faster on a CPU (2.2--2.4$\times$). One command rebuilds every number.
+At matched real file size and training effort, do different ways of compressing a Vision Transformer fail on the same images? I compress DeiT-Small four ways (3-bit, ternary, 4-bit with structured pruning, and distillation into DeiT-Tiny with 8-bit storage) to approximately the same \emph{measured} size (9.72--9.80\,MB, within 0.8\%) under an identical 3000-step budget, three seeds each, and measure disagreement against seed noise. Two quantisers of DeiT-Small disagree only 1.2$\times$ as often as two seeds of one route; a different quantiser family 1.4$\times$; pairs that change the network 1.8--2.0$\times$. Within DeiT-Small, the routes keep their clean ranking on all 14 corruptions (no reversal consistent across seeds in 42 paired tests per seed), while the size of the loss depends strongly on the damage type: ternary trails 3-bit by 17.7--20.2 points on noise but 5.9--6.4 on digital damage. The ranking reverses only in the cross-architecture comparison: ternary beats distilled DeiT-Tiny on clean images in all seeds ($+0.9$ to $+1.1$ points) and loses on damaged images in all seeds ($-3.7$ to $-3.9$); the uncompressed DeiT-Tiny shows the same reversal, which supports an architectural explanation. As a control, I show that the usual size formula, weights $\times$ bits $\div$ 8, understates real files by 1.5--53.5\% across five networks under the small groups a hard budget forces. The best model, 3-bit DeiT-Small at 9.718\,MB, loses 3.22 points against a 79.72\% baseline, and only the distilled route runs much faster on a CPU (2.2--2.4$\times$). One command re-derives and checks every reported number from the saved results.
 \end{abstract}
 
 \section{Introduction}
@@ -31,7 +32,7 @@ This project fixes the two things a deployment pays for, measured bytes and trai
 \item Four routes matched to within 0.8\% in measured size under equal fine-tuning, and a ranking of how far apart compression methods are, measured against a seed floor (\cref{sec:method,sec:fail}).
 \item Within one network, a stable ranking across all 14 corruptions (42 tests per seed) with damage-specific gaps; a reversal only in the cross-architecture comparison, where an uncompressed control supports an architectural explanation (\cref{sec:fail,sec:flip}).
 \item As a control, a measured audit of real file size against the formula for five networks (\cref{sec:size}).
-\item The P49 Pareto table of accuracy, size and CPU latency, and a repository where one command rebuilds every table.
+\item The P49 Pareto table of accuracy, size and CPU latency, and a repository where one command re-derives and checks every table.
 \end{itemize}
 
 \section{Related Work}
@@ -86,6 +87,7 @@ The routes are kept separate rather than stacked, so that each comparison at equ
 \begin{table*}[t]
 \centering
 \small
+\setlength{\tabcolsep}{5pt}
 \begin{tabular}{llcccccc}
 \toprule
  & Model & File (MB) & Clean top-1 & 3-seed range & Loss & Damaged (14) & CPU ms, Intel / M2 \\
@@ -143,7 +145,7 @@ To ask whether ternary is specially weak on noise or simply weaker (\cref{fig:ca
 
 \subsection{Pareto table: a smaller file is not a faster model}
 \label{sec:latency}
-Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.11$\times$ on both machines); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). A, C and D are Pareto-optimal (\cref{fig:pareto}); B is dominated by A (same speed, 4.1 points lower). PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel, so CPU conclusions are machine-specific.
+Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.11$\times$ on both machines); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). Among the four routes, A, C and D are Pareto-optimal (\cref{fig:pareto}); B is dominated by A (same speed, 4.1 points lower). PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel, so CPU conclusions are machine-specific.
 
 \subsection{Ablation: group size and compression stages}
 \label{sec:ablation}
@@ -152,6 +154,7 @@ Routes A and B are nine times smaller than the original but run at its speed (\c
 \begin{table}[t]
 \centering
 \small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{lccc}
 \toprule
 Stage (seed 0) & MB & Clean & Damaged \\
@@ -190,7 +193,7 @@ Under a hard size limit, measured bytes, not bits per weight, are the right budg
 
 \textbf{Reproducibility.} \texttt{reproduce.sh} re-derives every statistic and table from the saved per-image results and model files and checks each against the archived outputs, on a laptop in about 2 minutes; \texttt{src/make\_figures.py} redraws every figure; six notebooks print the real source of every step. Solo project, so no team contribution statement is required.
 
-\textbf{AI-assistance declaration.} AI assistants (Claude, via Claude Code) were used for: writing and debugging the analysis, evaluation and figure code; drafting and editing the proposal and this report; and checking numbers against the evidence and literature claims against the primary papers. All AI-generated code was reviewed, run and checked against the archived outputs with \texttt{reproduce.sh}, and is understood by the author. The following components contain no AI-generated content: \textbf{[to be completed by the author]}.
+\textbf{AI-assistance declaration.} AI assistants (Claude, via Claude Code) were used to develop and debug code for model-size auditing, compression-route construction, training, evaluation, statistical analysis, and figure generation; to assist in drafting and editing the proposal and final report; and to cross-check numerical results and references against experimental evidence and primary literature. All code in \texttt{src/}, \texttt{reproduce.sh} and the notebooks was generated with AI assistance. AI-assisted code and analyses were executed and checked against archived experimental outputs, including through \texttt{reproduce.sh}. The author takes responsibility for the final submitted work, including its experimental results, interpretations, limitations, and conclusions.
 
 {\small
 \bibliographystyle{ieeenat_fullname}
