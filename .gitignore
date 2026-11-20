@@ -6,3 +6,19 @@ audit_out/
 gpu_bundle/
 evidence/vitc_models.tgz
 docs/literature/*_fulltext.txt
+
+# credentials
+.env
+.env.*
+kaggle.json
+
+# notebooks
+.ipynb_checkpoints/
+
+# LaTeX build files
+report/*.aux
+report/*.log
+report/*.blg
+report/*.bbl
+report/*.out
+report/*.synctex.gz
