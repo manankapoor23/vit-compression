@@ -143,5 +143,8 @@ A fifth model using all three methods (distil → prune → quantise); intermedi
 longer training, since ternary was still improving fastest at step 3000.
 
 **30. Did you use AI?**
-Yes, declared in the report: Claude was used for code, writing and checking. I reviewed and ran all code,
-and every number is rebuilt by `reproduce.sh`. (Fill the declaration's last line yourself, honestly.)
+Yes, declared in full at the end of the report. All code in `src/`, `reproduce.sh` and the notebooks was
+generated with AI assistance (Claude, via Claude Code), which also helped draft and edit the proposal and report
+and cross-check numbers and references. The code and analyses were run and checked against the archived
+outputs, including through `reproduce.sh`. I take responsibility for the submitted work: its results,
+interpretations, limitations and conclusions.

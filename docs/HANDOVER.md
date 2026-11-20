@@ -13,8 +13,8 @@ For whoever (human or AI) continues this project. Final submission deadline: **1
 - Viva pack: `docs/VIVA.md` (30 questions with file:line pointers). Learning docs: `docs/What_We_Did.pdf` (the project as a story) and `docs/Project_Course.pdf` (concepts).
 
 ## Left for the author
-1. **AI declaration** — last line of `report/main.tex` says `[to be completed by the author]`. Fill it
-   honestly (Rule 4 of the course document: undeclared AI use = plagiarism). Then recompile.
+1. ~~**AI declaration**~~ — **done 2026-11-20.** Final wording is in `report/main.tex` (end of Sec. 7) and
+   matches `docs/VIVA.md` Q30.
 2. **Push and submit**: `git push`; submit `report/main.pdf` and the repo link.
 3. **Viva practice** with `docs/VIVA.md` and the notebooks.
 
