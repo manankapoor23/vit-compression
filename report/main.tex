@@ -12,7 +12,8 @@
 \title{Same Bytes, Different Failures:\\Do Different ViT Compression Routes Fail on the Same Images?}
 \author{Manan Kapoor\\
 Roll No. 1024030467\\
-UCS532 Computer Vision, Sessional Open Challenge, Problem P49}
+UCS532 Computer Vision, Sessional Open Challenge, Problem P49\\
+{\small\url{https://github.com/manankapoor23/vit-compression}}}
 
 \begin{document}
 \maketitle
@@ -34,6 +35,7 @@ This project fixes the two things a deployment pays for, measured bytes and trai
 \item As a control, a measured audit of real file size against the formula for five networks (\cref{sec:size}).
 \item The P49 Pareto table of accuracy, size and CPU latency, and a repository where one command re-derives and checks every table.
 \end{itemize}
+The extension beyond P49 is the investigation in \cref{sec:fail,sec:flip,sec:calib}: measuring route differences against a seed floor, testing where the reversal comes from with an uncompressed control, and testing whether ternary is specially weak on noise.
 
 \section{Related Work}
 \label{sec:related}
@@ -65,6 +67,8 @@ For DeiT-Small at group 256 the real file exceeds the formula by 4.5\% at 8 bits
 
 \section{Method}
 \label{sec:method}
+\textbf{Implemented and reused.} Reused: timm model definitions and the pretrained DeiT-Small and DeiT-Tiny weights~\cite{touvron2021deit}, the \texttt{imagecorruptions} package for ImageNet-C~\cite{hendrycks2019benchmarking}, the TWN threshold rule~\cite{li2016ternary}, PyTorch and SciPy. Implemented for this project: the raw binary file format and size audit, the group-wise and ternary quantisers with base-3 packing, MLP-channel pruning, the binary search that matches file sizes, the fine-tuning loop with simulated rounding and distillation, the evaluation, and all statistics.
+
 \textbf{Routes.} A \emph{route} is one recipe: compress, then fine-tune. Every route starts from pretrained timm weights. Each has one setting, found by binary search on the written file until it lands just under the target; accuracy is never used. \Cref{tab:main} lists the result.
 \begin{itemize}\setlength\itemsep{0pt}
 \item \textbf{A, 3-bit}: symmetric group-wise rounding, 36 weights per scale.
@@ -103,7 +107,7 @@ D & DeiT-Tiny, distilled, 8-bit & 9.765 & 71.41 & 71.24--71.54 & 8.31 & 48.16 & 
 \label{tab:main}
 \end{table*}
 
-\subsection{Routes of the same size fail on different images}
+\subsection{Failure analysis: same size, different failures}
 \label{sec:fail}
 Two seeds of one route disagree on 8.49\% (A), 9.55\% (B), 7.72\% (C) and 6.31\% (D) of the 50,000 clean images. Different routes disagree more in every pair (\cref{fig:seeds}): A--C 9.92\% against a floor of 8.11\% (1.2$\times$), A--B 1.4$\times$, B--C 1.4$\times$, B--D 1.8$\times$, A--D 1.9$\times$, C--D 2.0$\times$. Every 95\% interval of the excess over the floor excludes zero, and on damaged images the ratios are 1.2--1.9$\times$. The ratios order by how much each pair changes: two uniform quantisers of the same network (A--C) are nearly interchangeable at 1.2$\times$; a different quantiser family on the same network (ternary against A or C) gives 1.4$\times$; any pair that changes the network (with D) gives 1.8--2.0$\times$.
 
@@ -116,7 +120,7 @@ Two seeds of one route disagree on 8.49\% (A), 9.55\% (B), 7.72\% (C) and 6.31\%
 
 Within DeiT-Small, ternary's deficit grows under damage. Against 3-bit it is 3.46--3.92 points on clean images and 10.35--11.05 on damaged ones; the difference-in-differences is $+6.6$ to $+7.4$ points with every interval excluding zero. By family the deficit is largest for noise (17.7--20.2 points) and smallest for digital damage (5.9--6.4 points). Yet the order never reverses within DeiT-Small: for the three pairs of A, B and C on each of the 14 corruptions (42 McNemar tests per seed, Bonferroni $p<0.00119$), no corruption reverses the clean order in all three seeds, and none does so significantly in all three. This is consistent with the general clean-to-shifted relationship of accuracy-on-the-line~\cite{miller2021line} within one architecture; whether ternary departs from that relationship on noise is tested separately in \cref{sec:calib}. Within DeiT-Small, compression changed how much was lost and on which damage, but not the order.
 
-\subsection{The clean ranking reverses under damage}
+\subsection{Failure analysis: the clean ranking reverses under damage}
 \label{sec:flip}
 On clean images ternary beats the distilled model in every seed ($+1.02$, $+0.92$, $+1.12$ points; McNemar $p=1.2\times10^{-9}$, $3.3\times10^{-8}$, $1.4\times10^{-11}$). On damaged images the distilled model wins in every seed ($+3.83$, $+3.88$, $+3.71$ points; 95\% intervals $[3.34,4.33]$, $[3.40,4.38]$, $[3.22,4.20]$). All six tests pass the Bonferroni bar $p<0.0083$. On the original corruption set, D is ahead on 11 of 14 corruptions in all three seeds and significantly ahead on 7 (Bonferroni over 14); B is ahead only on elastic, pixelate and JPEG (\cref{fig:rank}).
 
@@ -203,7 +207,7 @@ D: distilled, 8-bit (submitted) & 9.77 & 71.24 & 48.31 \\
 \section{Conclusion}
 Under a hard size limit, measured bytes, not bits per weight, are the right budget. At approximately equal measured size and equal effort, compression routes are not interchangeable, and how far apart they are follows how much they change: two quantisers barely differ beyond seed noise, a different quantiser family more, a different network most. Within one network, the ranking held across every corruption while the size of the loss varied strongly by damage type; the ranking reversed only in the cross-architecture comparison, where an uncompressed control supports, but does not prove, an architectural explanation. A deployment choice made on clean accuracy and on paper size can therefore pick a larger, slower or less robust model than intended. A size-matched control that adds distillation to route A would isolate the effect of distillation at fixed architecture; separating architecture from the remaining differences between B and D needs further controls.
 
-\textbf{Reproducibility.} \texttt{reproduce.sh} re-derives every statistic and table from the saved per-image results and model files and checks each against the archived outputs, on a laptop in about 2 minutes; \texttt{src/make\_figures.py} redraws every figure; six notebooks print the real source of every step.
+\textbf{Reproducibility.} \texttt{bash run\_all.sh} sets up the environment, downloads the model files and runs \texttt{reproduce.sh}, which re-derives every statistic and table from the saved per-image results and model files and checks each against the archived outputs, on a laptop in about 2 minutes; \texttt{src/make\_figures.py} redraws every figure; six notebooks print the real source of every step.
 
 {\small
 \bibliographystyle{ieeenat_fullname}
