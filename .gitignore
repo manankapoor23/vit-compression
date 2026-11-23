@@ -22,3 +22,6 @@ report/*.blg
 report/*.bbl
 report/*.out
 report/*.synctex.gz
+
+# model files: hosted as a GitHub Release, fetched by run_all.sh
+evidence/models/*.bin
