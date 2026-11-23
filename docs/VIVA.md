@@ -47,8 +47,8 @@ small whole number. Weight ≈ code × scale. Example: 0.12, −0.40, 0.05 → c
 
 **9. Walk me through the four routes.**
 A: 3-bit, 36 weights per scale, 9.718 MB. B: ternary, 15 sensitive layers at 8 bits, 9.785 MB.
-C: 4-bit + 374 of 1,536 MLP channels pruned, 9.796 MB. D: DeiT-Tiny distilled from DeiT-Small, 8-bit with
-38 layers at 16 bits, 9.765 MB. Spread 0.80%.
+C: 4-bit + 374 of 1,536 MLP channels pruned, 9.796 MB. D: DeiT-Tiny distilled from DeiT-Small, 12 of 50 matrices at 8 bits,
+38 at 16 bits (70% of its weights), 9.765 MB. Spread 0.80%.
 
 **10. How did you make them the same size?**
 Each route has one setting. A binary search writes the real file, measures it, and narrows the range until
@@ -83,7 +83,7 @@ No. The exported model is always the step-3000 model; validation is only logged.
 
 **17. What is ImageNet-C and why only 14 corruptions?**
 Artificially damaged photos: noise, blur, weather, digital. I used 14 of 15 at severity 3 on 5,000 images.
-Glass blur was excluded: 865 s per 1,000 images, about 20× the others.
+Glass blur was excluded: 865 s per 1,000 images, against 1–67 s for each of the others.
 
 **18. What is a seed, and what is the seed floor?**
 A seed fixes the random choices in training. Two runs of the same route already disagree on some images:
@@ -111,11 +111,11 @@ route. And the clean ranking reverses: ternary beats the distilled model on clea
 
 **23. Isn't the reversal just because D is a different network?**
 Yes, mostly, and I measured it: uncompressed DeiT-Tiny already beats ternary by +5.51 on damaged images,
-route D by +3.81. Distillation and 8-bit *lowered* Tiny's damaged accuracy by 1.70. So it is a deployment
+route D by +3.81. Distillation and 8/16-bit storage *lowered* Tiny's damaged accuracy by 1.70. So it is a deployment
 result, not a distillation effect (`src/robustness_source.py`).
 
 **24. Is ternary specially weak on noise?**
-Consistent but not proven. It sits 4.4–5.0 points below the trend line of seven same-shape models in every
+Consistent but not proven. It sits 4.4–5.0 points below the trend line of seven DeiT-Small models (five group sizes of A, plus A and the pruned C) in every
 seed and passes the 95% rule I fixed in advance, but fails a Bonferroni-strict 98.3% range in 2 of 3 seeds
 and a plain-axis fit (`src/o7_trend.py`).
 

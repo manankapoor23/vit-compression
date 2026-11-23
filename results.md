@@ -39,7 +39,7 @@ papers print for "file size" is itself wrong by a predictable amount.
 | **1** | **Corruption fingerprints.** Inside one architecture, ternary's deficit concentrates in noise | Ternary vs INT3: **−17.7 to −20.2 pts on noise, −5.9 to −6.4 on digital**, against −3.5 to −3.9 clean; noise-minus-digital difference CI excludes 0 in 6/6 tests | Lost in Pruning (MLSys 2021); 2405.20876 | They compare compressed vs dense, one method at a time. We compare methods, at equal bytes, per corruption |
 | **2** | **Routes disagree beyond training randomness** | Cross-route disagreement is **1.2–2.0× the measured seed floor**; excess +1.8 to +7.0 pts clean, CI excludes 0 for all 6 pairs | Hooker 2019/2020; D'Amour 2020 (underspecification) | We *measure* the seed floor and subtract it; the route effect is what is left |
 | **3** | **The deployment decision flips** — shrink the architecture (D) or ternarize the weights (B)? | Clean favours B (+0.99, p ≤ 2.6e-08, 3/3 seeds); corruption favours D on 7/14 corruptions and B on 2/14 (significant, 3/3 seeds) | **Miller et al. 2021, *Accuracy on the Line*** | Stated as a decision-level result, **not** as a violation of accuracy-on-the-line: the flip needs D's architecture change (§1.5) |
-| **4** | **Size is misreported, on two axes, across 5 architectures** | INT2 overhead **+53.5% → +8.5%** as width grows 192 → 1024; overhead rises as bits fall in 5/5 models; 80/80 files rebuilt from shapes to within the header | M²XFP, SpQR (LLM side) | The accounting is standard in LLM quantization (small groups) and omitted by the ViT papers we checked, a fair convention for their per-channel scales (+2.2–5.4% in Mix-QViT's own layout) that fails at small groups and small models |
+| **4** | **Size is misreported, on two axes, across 5 architectures** | INT2 overhead **+53.5% → +8.5%** as width grows 192 → 1024; overhead rises as bits fall in 5/5 models; 80/80 files rebuilt from shapes to within the header | M²XFP, SpQR (LLM side) | The accounting is standard in LLM quantization (small groups) and omitted by the ViT papers we checked, a fair convention for their per-channel scales (+2.3–5.4% in Mix-QViT's own layout) that fails at small groups and small models |
 
 **Supporting, not headline:** metadata is 12.6% of route A's file (§3.1); the group-size sweep
 (§3.2); calibration is a uniform confidence offset (§1.6); ternary recovers 3.3× faster per step (§1.7).
@@ -406,7 +406,7 @@ hidden.
 **Corrected 2026-10-08 (authors' frame).** The earlier "9.0–19.2% short" compared Mix-QViT's figure with
 *our* files, which keep patch_embed/head at FP16 and use small groups. Mix-QViT quantizes per layer /
 per channel (Eq. 6–8) with patch_embed and head at 8-bit. Rebuilt that way from DeiT-S shapes [C]:
-per-channel symmetric FP16 scales + FP16 leftovers = **11.66 MB (+2.2%)**; asymmetric scale+zero +
+per-channel symmetric FP16 scales + FP16 leftovers = **11.66 MB (+2.3%; `src/mixqvit_size.py`)**; asymmetric scale+zero +
 FP32 leftovers = **12.01 MB (+5.4%)**. Per-channel scales cost 0.031 bits/weight vs 0.444 at group 36.
 Group-wise in the same layout: g256 +3.0%, g128 +4.4%, g64 +7.3%, g32 +13.1%.
 **Reading:** the formula is a fair convention for per-channel quantizers (LampQ defines its budget as
@@ -663,7 +663,7 @@ D vs A/B speed ratio depends on settings: int8 1 thr 2.57×, int8 4 thr 2.08×, 
 **Like-for-like with the M2 chart (fp32, 4 threads): 2.38× on Intel vs 2.23× on M2.** Intel int8 is 1.21× faster than fp32 for DeiT-S (1 thr); on M2 int8 was 4.6–5.7× slower — a qnnpack effect.
 
 **O6 — is ternary off the same-architecture line? (pre-registered test, run 2026-10-08)**
-Line: 7 same-shape models (5 group-sweep + A + C, per seed), probit axes, fitted on the same 5,000
+Line: 7 DeiT-Small models (5 group-sweep + A + the pruned C, per seed), probit axes, fitted on the same 5,000
 images as the damage set; joint image bootstrap. Raw: `evidence/rescore/o6_line.json`.
 
 | Seed | Noise residual | 95% CI (pre-registered) | 98.3% CI (Bonferroni, 3 seeds) | Plain-axis residual, 98.3% CI |

@@ -1,0 +1,2 @@
+symmetric, FP16 scales and leftovers          11.658 MB  = +2.3% over the printed 11.4 MB
+asymmetric, FP16 scale+zero, FP32 leftovers   12.020 MB  = +5.4% over the printed 11.4 MB

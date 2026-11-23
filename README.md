@@ -15,7 +15,7 @@ bash run_all.sh
 It creates `.venv`, installs `requirements.txt`, downloads the 21 model files from the
 [`models-v1` release](https://github.com/manankapoor23/vit-compression/releases/tag/models-v1) and checks
 their SHA-256, then re-derives every statistic and table from the saved per-image results and checks each
-against the archived output (6 checks), and prints Table 1. No dataset or GPU is needed.
+against the archived output (8 checks), and prints Table 1. No dataset or GPU is needed.
 
 ## Results
 
@@ -24,8 +24,8 @@ against the archived output (6 checks), and prints Table 1. No dataset or GPU is
 | — | DeiT-S, uncompressed | 88.24 MB | 79.72 | 62.64 | 71.4 / 17.8 ms |
 | A | 3-bit, one scale per 36 weights | 9.718 MB | 76.50 | 55.04 | 71.4 / 17.8 ms |
 | B | ternary (−1, 0, +1), 5 weights per byte; 15 layers at 8-bit | 9.785 MB | 72.43 | 44.35 | 71.4 / 17.8 ms |
-| C | 4-bit + 24.375% of MLP channels pruned | 9.796 MB | 75.70 | 53.55 | 64.1 / 16.1 ms |
-| D | DeiT-Tiny distilled from DeiT-S, 8-bit; 38 layers at 16-bit | 9.765 MB | 71.41 | 48.16 | 29.9 / 8.0 ms |
+| C | 4-bit + 374 of 1,536 MLP channels pruned (24.35%) | 9.796 MB | 75.70 | 53.55 | 64.1 / 16.1 ms |
+| D | DeiT-Tiny distilled from DeiT-S; 12 of 50 weight matrices 8-bit, 38 at 16-bit | 9.765 MB | 71.41 | 48.16 | 29.9 / 8.0 ms |
 
 Accuracy is the mean of 3 seeds. CPU time: fp32, 4 threads, batch 1, median of 50 runs.
 
@@ -62,10 +62,11 @@ GitHub without running anything. To re-run: `.venv/bin/pip install nbclient ipyk
 ```
 results.md         every number, its source, and how it was checked
 run_all.sh         one command: set up, download models, run reproduce.sh, print the main table
-reproduce.sh       re-derives and checks every statistic and table (6 checks, ~2 min, no GPU)
+reproduce.sh       re-derives and checks every statistic and table (8 checks, ~2 min, no GPU)
 report/            CVPR-format report (main.tex, main.pdf; build: tectonic -X compile main.tex)
 notebooks/         six executed notebooks that print the real source code
 proposal/          UCS532 proposal (HTML source + PDF)
+slides/            10-slide presentation (PPTX)
 src/
   phase1_audit.py       real file sizes vs the formula
   build_routes.py       build each route to an exact byte target
@@ -78,6 +79,8 @@ src/
   o7_trend.py           the ternary trend-line test (O7)
   rescore_check.py      do the model files reproduce the original run (99.71%)
   robustness_source.py  where route D's robustness comes from
+  bd_flip.py            ternary vs distilled Tiny: McNemar and Bonferroni intervals
+  mixqvit_size.py       Mix-QViT's 11.4 MB rebuilt in their own layout
   make_figures.py       draws every figure from saved results
   cpu_latency.py        CPU latency per route
   main_table.py         the result tables above
@@ -99,7 +102,7 @@ docs/                   code walkthrough, plan, notes; history/ keeps superseded
 - **Clean test:** all 50,000 validation images.
 - **Damaged test:** 14 of the 15 ImageNet-C corruptions at severity 3, generated on the fly from the first
   5,000 validation images with [`imagecorruptions`](https://github.com/bethgelab/imagecorruptions)
-  (glass blur excluded: about 20× slower than the others). Every model saw identical damaged images.
+  (glass blur excluded: 865 s per 1,000 images, against 1–67 s for the others). Every model saw identical damaged images.
 - **Seeds:** 0, 1 and 2 for every route, fixed in `src/train_routes.py` (lines 209–210) and printed at the
   top of each training log in `evidence/logs/`.
 

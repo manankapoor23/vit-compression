@@ -1,0 +1,4 @@
+14 corruptions; Bonferroni bar p < 0.0083, corrected interval 99.17%
+seed 0: clean B-D +1.02 (McNemar p=1.2e-09) | damaged D-B +3.83 95% [3.34, 4.33]  99.17% [3.15, 4.51]
+seed 1: clean B-D +0.92 (McNemar p=3.3e-08) | damaged D-B +3.88 95% [3.37, 4.37]  99.17% [3.22, 4.56]
+seed 2: clean B-D +1.12 (McNemar p=1.4e-11) | damaged D-B +3.71 95% [3.21, 4.20]  99.17% [3.03, 4.35]

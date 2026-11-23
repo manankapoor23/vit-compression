@@ -246,7 +246,7 @@ P = lambda a: _norm.ppf(np.clip(np.asarray(a) / 100, 1e-4, 1 - 1e-4))
 x, y = [cl(k) for k in ref], [nz(k) for k in ref]
 slope, icept = np.polyfit(P(x), P(y), 1)
 grid = np.linspace(71.5, 77.5, 50)
-a2.plot(grid, 100 * _norm.cdf(icept + slope * P(grid)), color="#999", lw=0.9, ls="--", label="trend of 7 same-shape models")
+a2.plot(grid, 100 * _norm.cdf(icept + slope * P(grid)), color="#999", lw=0.9, ls="--", label="trend of 7 DeiT-Small models")
 a2.scatter(x, y, s=18, color="#222", zorder=3)
 a2.scatter([cl("B-s0")], [nz("B-s0")], s=40, color="white", edgecolor="#222", lw=1, zorder=4, label="B ternary")
 a2.annotate(f"ternary: {-json.load(open('evidence/rescore/o6_line.json'))['noise_s0']['residual']:.1f} pts\nbelow the line", (cl("B-s0"), nz("B-s0")), xytext=(8, -4), textcoords="offset points", fontsize=7)
