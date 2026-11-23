@@ -91,19 +91,19 @@ The routes are kept separate rather than stacked, so that each comparison at equ
 \begin{table*}[t]
 \centering
 \small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{llcccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccccccc}
 \toprule
- & Model & File (MB) & Clean top-1 & 3-seed range & Loss & Damaged (14) & CPU ms, Intel / M2 \\
+ & Model & File (MB) & Clean top-1 & 3-seed range & Loss & Damaged (14) & CPU ms, Intel / M2 & Pareto \\
 \midrule
- & DeiT-Small, 32-bit & 88.24 & 79.72 & -- & -- & 62.64 & 71.4 / 17.8 \\
-A & 3-bit, group 36 & 9.718 & 76.50 & 76.44--76.56 & 3.22 & 55.04 & 71.4 / 17.8 \\
-B & ternary & 9.785 & 72.43 & 72.26--72.56 & 7.29 & 44.35 & 71.4 / 17.8 \\
-C & 4-bit + pruning & 9.796 & 75.70 & 75.66--75.73 & 4.02 & 53.55 & 64.1 / 16.1 \\
-D & DeiT-Tiny, distilled, 8/16-bit & 9.765 & 71.41 & 71.24--71.54 & 8.31 & 48.16 & 29.9 / 8.0 \\
+ & DeiT-Small, 32-bit & 88.24 & 79.72 & -- & -- & 62.64 & 71.4 / 17.8 & over limit \\
+A & 3-bit, group 36 & 9.718 & 76.50 & 76.44--76.56 & 3.22 & 55.04 & 71.4 / 17.8 & \checkmark \\
+B & ternary & 9.785 & 72.43 & 72.26--72.56 & 7.29 & 44.35 & 71.4 / 17.8 & no (A) \\
+C & 4-bit + pruning & 9.796 & 75.70 & 75.66--75.73 & 4.02 & 53.55 & 64.1 / 16.1 & \checkmark \\
+D & DeiT-Tiny, distilled, 8/16-bit & 9.765 & 71.41 & 71.24--71.54 & 8.31 & 48.16 & 29.9 / 8.0 & \checkmark \\
 \bottomrule
 \end{tabular}
-\caption{Main results (accuracy: mean of 3 seeds, re-scored from the model files). Damaged: mean over 14 corruptions at severity 3 on 5,000 images. CPU: 32-bit kernels, 4 threads, batch 1, median of 50 runs, measured per network shape; A and B run as the decoded 32-bit DeiT-Small, so their time equals the baseline's by construction (decoding time not included). The published DeiT-Small accuracy is 79.8\%.}
+\caption{Main results and the P49 Pareto table: accuracy $\times$ file size $\times$ CPU latency (accuracy: mean of 3 seeds, re-scored from the model files). Pareto: \checkmark\ = no other route is at least as good on clean accuracy, file size and CPU time and better on one, on both CPUs; B is beaten by A on all three. Damaged: mean over 14 corruptions at severity 3 on 5,000 images. CPU: 32-bit kernels, 4 threads, batch 1, median of 50 runs, measured per network shape; A and B run as the decoded 32-bit DeiT-Small, so their time equals the baseline's by construction (decoding time not included). The published DeiT-Small accuracy is 79.8\%.}
 \label{tab:main}
 \end{table*}
 
@@ -149,7 +149,7 @@ To ask whether ternary is specially weak on noise or simply weaker (\cref{fig:ca
 
 \subsection{Pareto table: a smaller file is not a faster model}
 \label{sec:latency}
-\emph{In short: only a smaller network makes the model much faster on a CPU.} Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.10$\times$ on the M2, 1.11$\times$ on Intel); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). Among the four routes, A, C and D are Pareto-optimal (no other route is both more accurate and faster; \cref{fig:pareto}); B is dominated by A (same speed, 4.1 points lower). For DeiT-Small, PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel at 1 thread (1.14$\times$ at 4), so CPU conclusions are machine-specific.
+\emph{In short: only a smaller network makes the model much faster on a CPU.} Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.10$\times$ on the M2, 1.11$\times$ on Intel); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). Among the four routes, A, C and D are Pareto-optimal on clean accuracy, file size and CPU time on both CPUs (no other route is at least as good on all three and better on one; \cref{tab:main,fig:pareto}); B is dominated by A (same speed, 4.1 points lower). For DeiT-Small, PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel at 1 thread (1.14$\times$ at 4), so CPU conclusions are machine-specific.
 
 \subsection{Ablation: group size and compression stages}
 \label{sec:ablation}
