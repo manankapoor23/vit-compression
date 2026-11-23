@@ -6,6 +6,17 @@ DeiT-Small (88.24 MB, 79.72% ImageNet top-1) compressed four ways to the same me
 (9.72–9.80 MB), each with the same 3000-step recovery budget and three seeds. Question: at equal
 bytes, do the routes fail on the same images?
 
+**Reproduce the main table (one command, CPU only, about 2 min):**
+
+```bash
+bash run_all.sh
+```
+
+It creates `.venv`, installs `requirements.txt`, downloads the 21 model files from the
+[`models-v1` release](https://github.com/manankapoor23/vit-compression/releases/tag/models-v1) and checks
+their SHA-256, then re-derives every statistic and table from the saved per-image results and checks each
+against the archived output (6 checks), and prints Table 1. No dataset or GPU is needed.
+
 ## Results
 
 | Route | What it does | File | Clean top-1 | Damaged (mean of 14) | CPU, x86 / M2 |
@@ -50,6 +61,7 @@ GitHub without running anything. To re-run: `.venv/bin/pip install nbclient ipyk
 
 ```
 results.md         every number, its source, and how it was checked
+run_all.sh         one command: set up, download models, run reproduce.sh, print the main table
 reproduce.sh       re-derives and checks every statistic and table (6 checks, ~2 min, no GPU)
 report/            CVPR-format report (main.tex, main.pdf; build: tectonic -X compile main.tex)
 notebooks/         six executed notebooks that print the real source code
@@ -70,20 +82,63 @@ src/
   cpu_latency.py        CPU latency per route
   main_table.py         the result tables above
 evidence/
-  models/               the 21 compressed model files (.bin)
+  models/               SHA256SUMS of the 21 model files (the .bin files are in the models-v1 release)
   logs/                 training/eval logs with per-image right/wrong arrays
   rescore/              Kaggle re-score, x86 latency, main tables
   audit_deit/, audit_multiarch/, analysis/, latency/
 docs/                   code walkthrough, plan, notes; history/ keeps superseded versions
 ```
 
-## Reproduce
+## Dataset
 
-```bash
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-./reproduce.sh
-```
+- **ImageNet-1k (ILSVRC 2012)**, WebDataset version
+  [`timm/imagenet-1k-wds`](https://huggingface.co/datasets/timm/imagenet-1k-wds) (access requires accepting
+  the ImageNet terms). Not included in this repository.
+- **Training subset:** the first 200 of the 1,024 training shards in sorted order (about 20% of the training
+  set; `src/train_routes.py`, `loaders`). Every route used the same 200 shards.
+- **Clean test:** all 50,000 validation images.
+- **Damaged test:** 14 of the 15 ImageNet-C corruptions at severity 3, generated on the fly from the first
+  5,000 validation images with [`imagecorruptions`](https://github.com/bethgelab/imagecorruptions)
+  (glass blur excluded: about 20× slower than the others). Every model saw identical damaged images.
+- **Seeds:** 0, 1 and 2 for every route, fixed in `src/train_routes.py` (lines 209–210) and printed at the
+  top of each training log in `evidence/logs/`.
 
-Training and evaluation ran on an H100 slice (until 2026-09-25); the re-score ran on a Kaggle T4
-(`docs/GPU_RUN.md`). Their outputs are in `evidence/`.
+## Hardware and runtime
+
+| Step | Hardware | Time |
+|---|---|---|
+| Training, one 3000-step run | NVIDIA H100 80GB, MIG 3g.40gb slice | about 25 min (route A log: 1.9–2.4 steps/s) |
+| Re-score of all 21 model files + x86 CPU timing | Kaggle, NVIDIA T4 + Intel Xeon @ 2.00GHz | 51 min (`evidence/rescore/kaggle_run.log`) |
+| CPU latency | Apple M2 and Intel Xeon, 4 threads, batch 1, median of 50 runs | not recorded separately |
+| `bash run_all.sh` | Apple M2 laptop, CPU only | about 2 min (tested from a fresh clone, 23 Nov 2026) |
+
+Training and evaluation need ImageNet and a GPU and are not re-run by `run_all.sh`; their logs and per-image
+results are in `evidence/`. The GPU commands are in `docs/GPU_RUN.md`.
+
+## Credits
+
+| Reused | Source | Used for |
+|---|---|---|
+| DeiT-Small and DeiT-Tiny pretrained weights | Touvron et al., ICML 2021; [facebookresearch/deit](https://github.com/facebookresearch/deit), loaded through timm | starting point of every route; distillation teacher |
+| timm | [huggingface/pytorch-image-models](https://github.com/huggingface/pytorch-image-models) (Apache-2.0) | model definitions and weights (DeiT, Swin-Tiny, ViT-Large for the size audit) |
+| ImageNet-1k | Deng et al., 2009; [image-net.org](https://www.image-net.org/); shards from `timm/imagenet-1k-wds` | training subset and test set |
+| ImageNet-C corruptions | Hendrycks and Dietterich, ICLR 2019; [`imagecorruptions`](https://github.com/bethgelab/imagecorruptions) (Michaelis et al., 2019) | damaged test images |
+| Ternary threshold rule | Li et al., Ternary Weight Networks, 2016 | route B (threshold 0.7 × mean \|w\|) |
+| Equal fine-tuning budget as the control | Kuzmin et al., NeurIPS 2023 | experimental design |
+| PyTorch, webdataset, NumPy, SciPy | open-source libraries | training, data loading, statistics |
+| CVPR LaTeX template | [cvpr-org/author-kit](https://github.com/cvpr-org/author-kit) | report formatting |
+
+All other code in this repository was written for this project (see the AI declaration below).
+
+## AI declaration
+
+AI assistants (Claude, via Claude Code) were used to develop and debug code for model-size auditing,
+compression-route construction, training, evaluation, statistical analysis, and figure generation; to assist
+in drafting and editing the proposal and final report; and to cross-check numerical results and references
+against experimental evidence and primary literature. All code in `src/`, `reproduce.sh`, `run_all.sh` and
+the notebooks was generated with AI assistance. AI-assisted code and analyses were executed and checked against
+archived experimental outputs, including through `reproduce.sh`. I take responsibility for the final submitted
+work, including its experimental results, interpretations, limitations, and conclusions.
+
+Solo project: Manan Kapoor (Roll No. 1024030467). Contribution statement: see the end of
+[`report/main.pdf`](report/main.pdf).
