@@ -30,7 +30,7 @@ because `/kaggle/working` is capped at 20 GB.
 !df -h /tmp /kaggle/working | cat ; nproc ; free -g | head -2
 ```
 Needs ~25 GB free under `/tmp` (shards + decoded images + corruptions). `/kaggle/working` is capped
-at 20 GB, so caches go to `/tmp`. **If `/tmp` shows less than 25 GB free, stop and tell Claude.**
+at 20 GB, so caches go to `/tmp`. **If `/tmp` shows less than 25 GB free, stop.**
 
 **Cell 2 — libraries + ImageNet validation (~10 min)**
 ```python
@@ -46,7 +46,7 @@ import os; os.environ["HF_TOKEN"] = UserSecretsClient().get_secret("HF_TOKEN")
 %cd /kaggle/working/vitc
 !python src/rescore.py --val /tmp/val --models evidence/models --out /kaggle/working/rescore.json --smoke
 ```
-Must print `GPU Tesla T4, autocast torch.float16` and end with `SMOKE OK`. **Send Claude the
+Must print `GPU Tesla T4, autocast torch.float16` and end with `SMOKE OK`. **Note the
 per-corruption seconds** — × 156 gives the real corruption time on 5,000 images, and that decides
 whether the full run fits in one 12-hour session.
 
@@ -124,8 +124,8 @@ finished models (the decoded images in `/tmp` are lost on disconnect and get reb
 
 ## After the run
 
-Download `rescore.json` and `cpu_latency_x86.json` from Drive into `evidence/rescore/` and tell
-Claude. The next step (on the Mac, no GPU) compares them with the archived results:
+Download `rescore.json` and `cpu_latency_x86.json` from Drive into `evidence/rescore/`.
+The next step (on the Mac, no GPU) compares them with the archived results:
 
 1. **Same images?** The route models' clean accuracies should match the archived 50,000-image
    numbers (A 76.49, B 72.40, C 75.68, D 71.41) within ~0.1 points, and per-image agreement should be

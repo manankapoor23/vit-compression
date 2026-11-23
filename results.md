@@ -5,8 +5,8 @@
 **Status:** Phases 1–3 complete. Offline re-analysis and five-architecture size audit completed
 2026-09-25 on the saved per-image arrays (no GPU). Every number is measured or computed.
 **Evidence:** `evidence/logs/` (68 raw logs, per-image `correct` arrays), `evidence/analysis/`,
-`evidence/audit_multiarch/`, `evidence/vitc_models.tgz` (all 21 model files). Previous version of
-this file: `docs/history/results_pre_2026-09-25.md`.
+`evidence/audit_multiarch/`, and the 21 model files (GitHub release `models-v1`, fetched by `run_all.sh`).
+Earlier versions of this file are in the git history.
 
 ---
 
@@ -451,7 +451,7 @@ pipeline never scored the uncompressed DeiT-S, so this number is **[A]** until P
 
 Route A spends **1.22 MB of its 9.718 MB file (12.6%) on scales.**
 
-Kuzmin et al. (NeurIPS 2023, §6, read in full from `docs/literature/kuzmin2023_pruning_vs_quantization_fulltext.txt`): unstructured pruning needs a
+Kuzmin et al. (NeurIPS 2023, §6, read in full): unstructured pruning needs a
 1-bit mask per weight, *"a 6.25% storage overhead at a minimum"* on FP16 weights, while *"the only
 storage overhead [for quantization] is a single scaling factor per tensor (or channel)."*
 

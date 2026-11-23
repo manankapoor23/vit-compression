@@ -89,7 +89,7 @@ evidence/
   logs/                 training/eval logs with per-image right/wrong arrays
   rescore/              Kaggle re-score, x86 latency, main tables
   audit_deit/, audit_multiarch/, analysis/, latency/
-docs/                   code walkthrough, plan, notes; history/ keeps superseded versions
+docs/GPU_RUN.md        GPU commands for the Kaggle re-score
 ```
 
 ## Dataset
