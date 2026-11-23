@@ -55,7 +55,7 @@ if diff -q "$TMP/o7.txt" evidence/rescore/o7_trend_stdout.txt >/dev/null && cmp 
 else
   echo "   DIFFERS"; cp "$TMP/o6_saved.json" evidence/rescore/o6_line.json; exit 1
 fi
-echo "== 7/8  ternary vs distilled DeiT-Tiny (Sec. 5.2) =="
+echo "== 7/8  ternary vs distilled DeiT-Tiny (Sec. 5.4) =="
 "$PY" src/bd_flip.py > "$TMP/bd.txt"
 diff -q "$TMP/bd.txt" evidence/rescore/bd_flip.txt >/dev/null && { cat "$TMP/bd.txt"; echo "   MATCH"; } || { echo "   DIFFERS"; diff "$TMP/bd.txt" evidence/rescore/bd_flip.txt; exit 1; }
 

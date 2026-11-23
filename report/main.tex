@@ -86,7 +86,7 @@ The routes are kept separate rather than stacked, so that each comparison at equ
 
 \textbf{Checks.} All 21 model files decode and re-encode byte-identically. Every model was re-scored from its file on a different GPU (Kaggle T4, float16); for the 12 route models on clean images, 99.71\% of 600,000 per-image answers match the original run (bfloat16, H100).
 
-\section{Results}
+\section{Experiments}
 \label{sec:results}
 \begin{table*}[t]
 \centering
@@ -106,6 +106,45 @@ D & DeiT-Tiny, distilled, 8/16-bit & 9.765 & 71.41 & 71.24--71.54 & 8.31 & 48.16
 \caption{Main results and the P49 Pareto table: accuracy $\times$ file size $\times$ CPU latency (accuracy: mean of 3 seeds, re-scored from the model files). Pareto: \checkmark\ = no other route is at least as good on clean accuracy, file size and CPU time and better on one, on both CPUs; B is beaten by A on all three. Damaged: mean over 14 corruptions at severity 3 on 5,000 images. CPU: 32-bit kernels, 4 threads, batch 1, median of 50 runs, measured per network shape; A and B run as the decoded 32-bit DeiT-Small, so their time equals the baseline's by construction (decoding time not included). The published DeiT-Small accuracy is 79.8\%.}
 \label{tab:main}
 \end{table*}
+
+\subsection{Pareto table: a smaller file is not a faster model}
+\label{sec:latency}
+\emph{In short: only a smaller network makes the model much faster on a CPU.} Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.10$\times$ on the M2, 1.11$\times$ on Intel); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). Among the four routes, A, C and D are Pareto-optimal on clean accuracy, file size and CPU time on both CPUs (no other route is at least as good on all three and better on one; \cref{tab:main,fig:pareto}); B is dominated by A (same speed, 4.1 points lower). For DeiT-Small, PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel at 1 thread (1.14$\times$ at 4), so CPU conclusions are machine-specific.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{fig6_pareto}
+\caption{Pareto plot (Apple M2, 4 threads): clean accuracy against CPU time per image. A, C and D lie on the best-trade-off line; B is dominated by A.}
+\label{fig:pareto}
+\end{figure}
+
+\subsection{Ablation: group size and compression stages}
+\label{sec:ablation}
+\emph{In short: smaller groups buy accuracy with bytes; for D, most of the loss comes from the smaller network.} \Cref{tab:stages} shows what each step buys. Rebuilding route A with fewer weights per scale (512 down to 36) adds 1.13\,MB and raises clean accuracy by 2.0 points and damaged accuracy by 4.8; below 36 the file passes the matched size with no further clean gain. For route D, swapping to DeiT-Tiny costs 7.7 points; distillation and 8/16-bit storage down to 9.77\,MB cost a further 0.8. Intermediate stages of B and C were not saved.
+
+\begin{table}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccc}
+\toprule
+Stage (seed 0) & MB & Clean & Damaged \\
+\midrule
+DeiT-Small, 32-bit & 88.24 & 79.72 & 62.64 \\
+A: 3-bit, group 512 & 8.59 & 74.51 & 50.07 \\
+A: 3-bit, group 256 & 8.67 & 75.21 & 51.63 \\
+A: 3-bit, group 128 & 8.84 & 75.75 & 52.94 \\
+A: 3-bit, group 64 & 9.19 & 76.14 & 54.13 \\
+A: 3-bit, group 36 (submitted) & 9.72 & 76.51 & 54.90 \\
+A: 3-bit, group 32 & 9.87 & 76.51 & 54.99 \\
+\midrule
+DeiT-Tiny, 32-bit & 22.90 & 72.02 & 49.86 \\
+D: distilled, 8/16-bit (submitted) & 9.77 & 71.24 & 48.31 \\
+\bottomrule
+\end{tabular}
+\caption{Ablation: what each compression stage buys and costs. Accuracy from the re-score of the model files.}
+\label{tab:stages}
+\end{table}
 
 \subsection{Failure analysis: same size, different failures}
 \label{sec:fail}
@@ -145,45 +184,6 @@ To ask whether ternary is specially weak on noise or simply weaker (\cref{fig:ca
 \includegraphics[width=\linewidth]{fig8_calibration_trend}
 \caption{Left: ECE before and after temperature scaling (mean of 3 seeds, odd-numbered images). Right: noise accuracy against clean accuracy for seven DeiT-Small models (seed 0), with ternary below the fitted trend.}
 \label{fig:calib}
-\end{figure}
-
-\subsection{Pareto table: a smaller file is not a faster model}
-\label{sec:latency}
-\emph{In short: only a smaller network makes the model much faster on a CPU.} Routes A and B are nine times smaller than the original but run at its speed (\cref{tab:main}): no CPU kernel executes 3-bit or ternary weights, so they are expanded at load time. Pruning (C) gains about 10\% (1.10$\times$ on the M2, 1.11$\times$ on Intel); only the distilled DeiT-Tiny is much faster, 2.23$\times$ on an Apple M2 and 2.38$\times$ on an Intel Xeon (32-bit, 4 threads). Among the four routes, A, C and D are Pareto-optimal on clean accuracy, file size and CPU time on both CPUs (no other route is at least as good on all three and better on one; \cref{tab:main,fig:pareto}); B is dominated by A (same speed, 4.1 points lower). For DeiT-Small, PyTorch's dynamic 8-bit quantisation is 4.6--5.7$\times$ slower than 32-bit on the M2 but 1.21$\times$ faster on Intel at 1 thread (1.14$\times$ at 4), so CPU conclusions are machine-specific.
-
-\subsection{Ablation: group size and compression stages}
-\label{sec:ablation}
-\emph{In short: smaller groups buy accuracy with bytes; for D, most of the loss comes from the smaller network.} \Cref{tab:stages} shows what each step buys. Rebuilding route A with fewer weights per scale (512 down to 36) adds 1.13\,MB and raises clean accuracy by 2.0 points and damaged accuracy by 4.8; below 36 the file passes the matched size with no further clean gain. For route D, swapping to DeiT-Tiny costs 7.7 points; distillation and 8/16-bit storage down to 9.77\,MB cost a further 0.8. Intermediate stages of B and C were not saved.
-
-\begin{table}[t]
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lccc}
-\toprule
-Stage (seed 0) & MB & Clean & Damaged \\
-\midrule
-DeiT-Small, 32-bit & 88.24 & 79.72 & 62.64 \\
-A: 3-bit, group 512 & 8.59 & 74.51 & 50.07 \\
-A: 3-bit, group 256 & 8.67 & 75.21 & 51.63 \\
-A: 3-bit, group 128 & 8.84 & 75.75 & 52.94 \\
-A: 3-bit, group 64 & 9.19 & 76.14 & 54.13 \\
-A: 3-bit, group 36 (submitted) & 9.72 & 76.51 & 54.90 \\
-A: 3-bit, group 32 & 9.87 & 76.51 & 54.99 \\
-\midrule
-DeiT-Tiny, 32-bit & 22.90 & 72.02 & 49.86 \\
-D: distilled, 8/16-bit (submitted) & 9.77 & 71.24 & 48.31 \\
-\bottomrule
-\end{tabular}
-\caption{Ablation: what each compression stage buys and costs. Accuracy from the re-score of the model files.}
-\label{tab:stages}
-\end{table}
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.85\linewidth]{fig6_pareto}
-\caption{Pareto plot (Apple M2, 4 threads): clean accuracy against CPU time per image. A, C and D lie on the best-trade-off line; B is dominated by A.}
-\label{fig:pareto}
 \end{figure}
 
 \section{Changes from the Proposal}

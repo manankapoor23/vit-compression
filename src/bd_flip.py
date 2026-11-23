@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ternary (B) vs distilled DeiT-Tiny (D): the clean/damaged reversal, per seed (report Sec. 5.2).
+"""Ternary (B) vs distilled DeiT-Tiny (D): the clean/damaged reversal, per seed (report Sec. 5.4).
 
 Reads evidence/rescore/rescore.json (every model re-scored from its .bin file).
 Clean:   B - D accuracy and McNemar's exact test (binomial test on the discordant images).
